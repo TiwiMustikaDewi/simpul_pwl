@@ -149,7 +149,7 @@ class AuthController extends Controller
         }
 
         return match ($user->role) {
-            'admin' => view('dashboard-admin'),
+            'admin' => redirect()->route('admin.dashboard'),
             'supervisor' => view('dashboard-supervisor'),
             'student' => view('dashboard'),
             default => abort(
