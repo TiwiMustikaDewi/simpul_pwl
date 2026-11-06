@@ -5,14 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrasi | SIMPUL</title>
 
+    <!-- Poppins Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --blue: #1976e8;
-            --blue-dark: #174b91;
-            --bg: #f1f7ff;
-            --text: #183153;
-            --muted: #71839d;
-            --border: #dce8f6;
+            --navy:    #003B5C;
+            --ocean:   #005C8A;
+            --primary: #0095D9;
+            --cyan:    #38BDF8;
+            --teal:    #06B6D4;
+            --fog:     #DCF1FB;
+            --bg:      #F0F7FD;
+            --white:   #FFFFFF;
+            --text:    #09111E;
+            --body:    #162238;
+            --muted:   #2B3D56;
+            --border:  #C8E1F5;
         }
 
         * {
@@ -25,11 +36,11 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            font-family: "Segoe UI", Arial, sans-serif;
-            color: var(--text);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--body);
             background:
-                radial-gradient(circle at 10% 15%, #d9edff 0, transparent 30%),
-                radial-gradient(circle at 90% 85%, #d9edff 0, transparent 30%),
+                radial-gradient(ellipse 70% 50% at 10% 15%, rgba(0, 149, 217, 0.14) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 90% 85%, rgba(56, 189, 248, 0.12) 0%, transparent 60%),
                 var(--bg);
         }
 
