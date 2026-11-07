@@ -3,6 +3,12 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\WorkflowController as AdminWorkflowController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Dosen\BimbinganController as DosenBimbinganController;
+use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
+use App\Http\Controllers\Dosen\LogbookController as DosenLogbookController;
+use App\Http\Controllers\Dosen\ProfileController as DosenProfileController;
+use App\Http\Controllers\Dosen\ReportController as DosenReportController;
+use App\Http\Controllers\Dosen\SidangController as DosenSidangController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -95,7 +101,43 @@ Route::middleware(['auth', 'role:supervisor'])
     ->prefix('dosen')
     ->name('dosen.')
     ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('dashboard-supervisor');
-        })->name('dashboard');
+        Route::get('/dashboard', [DosenDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Mahasiswa Bimbingan
+        Route::get('/bimbingan', [DosenBimbinganController::class, 'index'])
+            ->name('students.index');
+        Route::get('/bimbingan/{internship}', [DosenBimbinganController::class, 'show'])
+            ->whereNumber('internship')
+            ->name('students.show');
+
+        // Logbook
+        Route::get('/logbook', [DosenLogbookController::class, 'index'])
+            ->name('logs.index');
+        Route::post('/logbook/{log}/review', [DosenLogbookController::class, 'review'])
+            ->whereNumber('log')
+            ->name('logs.review');
+
+        // Laporan Akhir
+        Route::get('/laporan', [DosenReportController::class, 'index'])
+            ->name('reports.index');
+        Route::post('/laporan/{report}/review', [DosenReportController::class, 'review'])
+            ->whereNumber('report')
+            ->name('reports.review');
+        Route::get('/laporan/{report}/download', [DosenReportController::class, 'download'])
+            ->whereNumber('report')
+            ->name('reports.download');
+
+        // Sidang & Penilaian
+        Route::get('/sidang', [DosenSidangController::class, 'index'])
+            ->name('sidang.index');
+        Route::post('/sidang/{sidang}/nilai', [DosenSidangController::class, 'grade'])
+            ->whereNumber('sidang')
+            ->name('sidang.grade');
+
+        // Profil Dosen
+        Route::get('/profil', [DosenProfileController::class, 'index'])
+            ->name('profile.index');
+        Route::put('/profil', [DosenProfileController::class, 'update'])
+            ->name('profile.update');
     });
