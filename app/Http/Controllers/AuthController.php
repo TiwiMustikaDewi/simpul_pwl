@@ -150,7 +150,7 @@ class AuthController extends Controller
 
         return match ($user->role) {
             'admin' => redirect()->route('admin.dashboard'),
-            'supervisor' => view('dashboard-supervisor'),
+            'supervisor' => redirect()->route('dosen.dashboard'),
             'student' => redirect()->route('mahasiswa.dashboard'),
             default => abort(
                 403,
