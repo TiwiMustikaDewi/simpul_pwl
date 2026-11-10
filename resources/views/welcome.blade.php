@@ -188,6 +188,7 @@
             color: #ffffff !important;
             font-size: 13px;
             font-weight: 600;
+            text-decoration: none;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.32);
             transition: all .25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -410,6 +411,14 @@
             color: #1d4ed8 !important;
             transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+        }
+
+        .btn-cta-secondary svg {
+            transition: transform .2s ease;
+        }
+
+        .btn-cta-secondary:hover svg {
+            transform: translateX(3px);
         }
 
         .hero-trust-badge {
@@ -1245,6 +1254,11 @@
                 <a href="#komunitas">Ekosistem</a>
                 <a href="#fitur">Fitur</a>
                 <a href="#alur">Alur KP</a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="btn-nav-login">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="btn-nav-login">Masuk</a>
+                @endauth
             </nav>
         </div>
     </header>
@@ -1285,14 +1299,11 @@
                     </p>
 
                     <div class="hero-cta-group">
-                        <a href="{{ route('login') }}" class="btn-cta-primary">
-                            <span>Masuk</span>
-                        </a>
-
                         <a href="#alur" class="btn-cta-secondary">
-                            <span>Pelajari Alur KP</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
+                            <span>Pelajari KP</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
                             </svg>
                         </a>
                     </div>
