@@ -151,7 +151,7 @@ class AuthController extends Controller
         return match ($user->role) {
             'admin' => redirect()->route('admin.dashboard'),
             'supervisor' => redirect()->route('dosen.dashboard'),
-            'student' => view('dashboard'),
+            'student' => redirect()->route('mahasiswa.dashboard'),
             default => abort(
                 403,
                 'Role akun tidak memiliki akses.'
