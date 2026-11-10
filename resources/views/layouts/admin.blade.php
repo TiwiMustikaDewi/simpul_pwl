@@ -5,7 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard Admin') | SIMPUL</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/simpul-admin.css') }}">
+
+    <style>
+        body, button, input, select, textarea {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+
+        :root {
+            --brand-primary: #4079ea;
+            --brand-dark: #1d4ed8;
+            --brand-light: #eff6ff;
+        }
+
+        .nav-link.active {
+            background: #eaf1fd;
+            color: var(--brand-primary);
+            font-weight: 600;
+            border-right: 3px solid var(--brand-primary);
+        }
+    </style>
     @stack('styles')
 </head>
 <body>
