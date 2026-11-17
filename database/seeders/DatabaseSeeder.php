@@ -541,15 +541,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        SidangKp::updateOrCreate(
-            ['internship_id' => $tiwiInternship->id],
-            [
-                'sidang_date' => null,
-                'room' => null,
-                'status' => 'submitted',
-                'grade' => null,
-                'notes' => 'Menunggu verifikasi berkas laporan dan penjadwalan oleh admin jurusan.',
-            ]
-        );
+        // Sidang Tiwi dikosongkan agar mahasiswa dapat menguji alur pengajuan pendaftaran sidang
+        // SidangKp::updateOrCreate(['internship_id' => $tiwiInternship->id], ...);
     }
 }

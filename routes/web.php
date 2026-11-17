@@ -14,6 +14,7 @@ use App\Http\Controllers\Student\CompanyController as StudentCompanyController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\ExperienceController as StudentExperienceController;
 use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
+use App\Http\Controllers\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Student\ReportController as StudentReportController;
 use App\Http\Controllers\Student\SidangController as StudentSidangController;
 use Illuminate\Support\Facades\Route;
@@ -119,6 +120,12 @@ Route::middleware(['auth', 'role:student'])
         // Pengajuan Kesiapan KP
         Route::get('/pengajuan', [StudentApplicationController::class, 'create'])->name('applications.create');
         Route::post('/pengajuan', [StudentApplicationController::class, 'store'])->name('applications.store');
+        Route::post('/pengajuan/{internship}/konfirmasi-diterima', [StudentApplicationController::class, 'confirmAcceptance'])
+            ->whereNumber('internship')
+            ->name('applications.confirm-acceptance');
+        Route::post('/pengajuan/{internship}/batal', [StudentApplicationController::class, 'cancel'])
+            ->whereNumber('internship')
+            ->name('applications.cancel');
 
         // Logbook Harian
         Route::get('/logbook', [StudentLogbookController::class, 'index'])->name('logbook.index');
@@ -135,9 +142,21 @@ Route::middleware(['auth', 'role:student'])
         Route::get('/sidang', [StudentSidangController::class, 'index'])->name('sidang.index');
         Route::post('/sidang', [StudentSidangController::class, 'store'])->name('sidang.store');
 
-        // Berbagi Pengalaman Alumni
-        Route::get('/pengalaman', [StudentExperienceController::class, 'create'])->name('experiences.create');
+        // Ulasan Pengalaman Alumni
+        Route::get('/pengalaman', [StudentExperienceController::class, 'index'])->name('experiences.index');
+        Route::get('/pengalaman/tulis', [StudentExperienceController::class, 'create'])->name('experiences.create');
         Route::post('/pengalaman', [StudentExperienceController::class, 'store'])->name('experiences.store');
+
+        // Pusat Notifikasi Mahasiswa
+        Route::get('/notifikasi', [StudentNotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('/notifikasi/{notification}/baca', [StudentNotificationController::class, 'markAsRead'])
+            ->whereNumber('notification')
+            ->name('notifications.read');
+        Route::post('/notifikasi/baca-semua', [StudentNotificationController::class, 'markAllAsRead'])
+            ->name('notifications.read-all');
+        Route::delete('/notifikasi/{notification}', [StudentNotificationController::class, 'destroy'])
+            ->whereNumber('notification')
+            ->name('notifications.destroy');
     });
 
 Route::middleware(['auth', 'role:supervisor'])

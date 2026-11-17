@@ -2,9 +2,27 @@
 
 @section('title', 'Logbook Kegiatan Harian KP')
 
+@push('styles')
+<style>
+    .logbook-input-grid {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 16px;
+        margin-bottom: 14px;
+    }
+
+    @media (max-width: 640px) {
+        .logbook-input-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
 <div style="margin-bottom: 24px;">
-    <h2 style="font-size: 22px; font-weight: 700; color: var(--text);">Logbook Kegiatan Harian Kuliah Praktik</h2>
+    <h2 style="font-size: clamp(19px, 4.5vw, 22px); font-weight: 700; color: var(--text);">Logbook Kegiatan Harian Kuliah Praktik</h2>
     <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">
         Catat seluruh aktivitas pekerjaan harian selama pelaksanaan KP untuk ditinjau dan divalidasi oleh Dosen Pembimbing.
     </p>
@@ -12,13 +30,15 @@
 
 @if (! $internship)
     <div class="panel" style="text-align: center; padding: 40px;">
-        <div style="font-size: 32px; margin-bottom: 10px;">📋</div>
+        <div style="margin-bottom: 14px;">
+            <iconify-icon icon="lucide:clipboard-list" width="42" height="42" style="color: #94a3b8;"></iconify-icon>
+        </div>
         <h3 style="font-size: 16px; font-weight: 700;">Belum Ada Pelaksanaan KP Aktif</h3>
         <p style="font-size: 13px; color: var(--muted); max-width: 480px; margin: 4px auto 16px;">
             Fitur logbook harian dapat diakses setelah pengajuan kesiapan KP kamu disetujui oleh Admin Jurusan dan Dosen Pembimbing telah ditetapkan.
         </p>
         <a href="{{ route('mahasiswa.applications.create') }}" class="btn-brand">
-            Ajukan Kesiapan KP Sekarang →
+            Ajukan Kesiapan KP Sekarang
         </a>
     </div>
 @else
@@ -42,14 +62,15 @@
 
     <!-- FORM INPUT LOGBOOK HARIAN -->
     <div class="panel" style="margin-bottom: 24px;">
-        <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px;">
-            ✍ Tambah Catatan Kegiatan Harian
+        <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+            <iconify-icon icon="lucide:pen-line" width="17" height="17" style="color: var(--brand-primary);"></iconify-icon>
+            <span>Tambah Catatan Kegiatan Harian</span>
         </h3>
 
         <form action="{{ route('mahasiswa.logbook.store') }}" method="POST">
             @csrf
 
-            <div style="display: grid; grid-template-columns: 220px 1fr; gap: 16px; margin-bottom: 14px;">
+            <div class="logbook-input-grid">
                 <div>
                     <label for="date" style="font-weight: 600; font-size: 12.5px; display: block; margin-bottom: 5px;">
                         Tanggal Kegiatan <span style="color: red;">*</span>
@@ -96,7 +117,7 @@
 
             <div style="display: flex; justify-content: flex-end;">
                 <button type="submit" class="btn-brand">
-                    Simpan & Kirim ke Pembimbing →
+                    Simpan &amp; Kirim ke Pembimbing
                 </button>
             </div>
         </form>
@@ -104,8 +125,9 @@
 
     <!-- DAFTAR LOGBOOK -->
     <div class="panel">
-        <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px;">
-            📑 Riwayat Logbook Kegiatan
+        <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+            <iconify-icon icon="lucide:history" width="18" height="18" style="color: var(--brand-primary);"></iconify-icon>
+            <span>Riwayat Logbook Kegiatan</span>
         </h3>
 
         @if ($logs->isNotEmpty())

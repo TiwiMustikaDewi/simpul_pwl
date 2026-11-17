@@ -74,13 +74,26 @@ class Company extends Model
 
         $pendingCount = $pendingInternships->count();
 
+        $applicants = [];
+        foreach ($pendingInternships as $item) {
+            if ($item->type === 'group') {
+                $grpName = $item->group?->name ?? 'Kelompok';
+                $ldrName = $item->student?->user?->name ?? '-';
+                $applicants[] = "{$grpName} (Ketua: {$ldrName})";
+            } else {
+                if ($item->student?->user?->name) {
+                    $applicants[] = $item->student->user->name;
+                }
+            }
+        }
+
         // Determine status text & badges
         if ($hasGroup) {
-            $statusLabel = 'Kuota Terpenuhi (1 Kelompok)';
+            $statusLabel = 'Tempat KP Sudah Diisi (1 Kelompok)';
             $badgeVariant = 'danger'; // Red/Full
             $capacityPercent = 100;
         } elseif ($individualCount >= 3) {
-            $statusLabel = 'Kuota Terpenuhi (3/3 Individu)';
+            $statusLabel = 'Tempat KP Sudah Diisi (3/3 Individu)';
             $badgeVariant = 'danger';
             $capacityPercent = 100;
         } elseif ($individualCount > 0) {
@@ -98,11 +111,13 @@ class Company extends Model
             'has_group' => $hasGroup,
             'group_internship' => $groupInternship,
             'individual_count' => $individualCount,
+            'accepted_count' => $hasGroup ? ($groupInternship->group?->members()->count() ?: 1) : $individualCount,
             'individual_internships' => $individualInternships,
             'remaining_individual' => $hasGroup ? 0 : max(0, 3 - $individualCount),
             'can_accept_individual' => ! $hasGroup && ($individualCount < 3),
             'can_accept_group' => ! $hasGroup && ($individualCount === 0),
             'occupants' => $occupants,
+            'applicants' => $applicants,
             'pending_count' => $pendingCount,
             'status_label' => $statusLabel,
             'badge_variant' => $badgeVariant,

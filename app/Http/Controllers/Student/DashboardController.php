@@ -37,6 +37,26 @@ class DashboardController extends Controller
                 ->first();
         }
 
+        // Determine actual step from database state
+        $currentStep = 1;
+        if ($internship) {
+            if ($internship->status === 'pending') {
+                $currentStep = 1;
+            } elseif ($internship->status === 'approved') {
+                $currentStep = 2;
+            } elseif ($internship->status === 'in_progress') {
+                if ($internship->sidang && in_array($internship->sidang->status, ['submitted', 'scheduled', 'completed'])) {
+                    $currentStep = 4;
+                } elseif ($internship->reports()->where('status', 'approved')->exists()) {
+                    $currentStep = 4;
+                } else {
+                    $currentStep = ($internship->logs()->count() > 0) ? 3 : 2;
+                }
+            } elseif ($internship->status === 'completed') {
+                $currentStep = 5;
+            }
+        }
+
         // Available companies count & preview
         $companies = Company::with(['internships.group', 'internships.student.user'])
             ->limit(4)
@@ -54,6 +74,7 @@ class DashboardController extends Controller
             'internship' => $internship,
             'companies' => $companies,
             'notifications' => $notifications,
+            'currentStep' => $currentStep,
         ]);
     }
 }

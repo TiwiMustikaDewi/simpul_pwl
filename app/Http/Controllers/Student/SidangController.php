@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Internship;
 use App\Models\SidangKp;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,8 +54,22 @@ class SidangController extends Controller
             return back()->with('info', 'Pengajuan sidang sudah terdaftar.');
         }
 
+        $validated = $request->validate([
+            'proposed_date' => ['required', 'date', 'after:now'],
+            'presentation_file' => ['nullable', 'file', 'mimes:pdf,ppt,pptx,zip', 'max:20480'],
+            'student_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $filePath = null;
+        if ($request->hasFile('presentation_file')) {
+            $filePath = $request->file('presentation_file')->store('presentation_slides', 'public');
+        }
+
         SidangKp::create([
             'internship_id' => $internship->id,
+            'proposed_date' => ! empty($validated['proposed_date']) ? Carbon::parse($validated['proposed_date']) : null,
+            'presentation_file' => $filePath,
+            'student_notes' => $validated['student_notes'] ?? null,
             'sidang_date' => null,
             'room' => null,
             'status' => 'submitted',
@@ -62,6 +77,6 @@ class SidangController extends Controller
             'notes' => null,
         ]);
 
-        return back()->with('success', 'Pendaftaran sidang KP berhasil diajukan! Admin Jurusan akan menjadwalkan waktu dan ruangan sidang.');
+        return back()->with('success', 'Pendaftaran sidang KP berhasil diajukan! Usulan jadwal Anda telah dikirimkan ke Admin Jurusan untuk diverifikasi dan ditetapkan.');
     }
 }

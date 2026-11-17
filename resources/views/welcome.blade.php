@@ -213,7 +213,7 @@
                 #dbeafe 93%, 
                 #ffffff 100%
             );
-            overflow: hidden;
+            overflow-x: clip;
             padding: 56px 0 70px;
             color: white;
         }
@@ -432,167 +432,231 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════
-           HERO RIGHT: FLOATING WHITE SERVICE HUB CARD (MONOPOL STYLE)
+           HERO RIGHT: ILUSTRASI 2 MAHASISWA & DYNAMIC ANIMATED SHAPES
         ═══════════════════════════════════════════════════════════════ */
-        .system-hub-card {
+        .hero-illustration-stage {
             position: relative;
-            background: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 22px;
-            box-shadow: var(--shadow-float);
-            overflow: hidden;
-            color: var(--ink-body);
-        }
-
-        .hub-card-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 13px 20px;
-            background: linear-gradient(90deg, #f0f7ff 0%, #e0f2fe 100%);
-            border-bottom: 1px solid var(--border-soft);
+            justify-content: center;
+            width: 100%;
+            min-height: 480px;
         }
 
-        .hub-title-block {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--sky-dark);
+        .illustration-ambient-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(147, 197, 253, 0.45) 45%, rgba(59, 130, 246, 0.15) 70%, transparent 85%);
+            filter: blur(48px);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: pulseAura 7s ease-in-out infinite alternate;
         }
 
-        .live-status-pill {
+        .illustration-halo-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 440px;
+            height: 440px;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(255, 255, 255, 0.45);
+            pointer-events: none;
+            z-index: 1;
+            animation: rotateAura 32s linear infinite;
+        }
+
+        @keyframes pulseAura {
+            0%   { transform: translate(-50%, -50%) scale(0.95); opacity: 0.65; }
+            100% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.95; }
+        }
+
+        @keyframes rotateAura {
+            0%   { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .hero-students-img {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 460px;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 18px 32px rgba(15, 23, 42, 0.14));
+            animation: floatIllustration 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatIllustration {
+            0%   { transform: translateY(0px); }
+            100% { transform: translateY(-10px); }
+        }
+
+        /* ── Floating Origami Paper Planes ── */
+        .decor-paper-plane {
+            position: absolute;
+            z-index: 3;
+            pointer-events: none;
+            filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.22));
+        }
+
+        .decor-plane-1 {
+            top: 6%;
+            right: 8%;
+            animation: planeGliding1 6s ease-in-out infinite alternate;
+        }
+
+        .decor-plane-2 {
+            top: 26%;
+            right: 2%;
+            animation: planeGliding2 5.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes planeGliding1 {
+            0%   { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-14px, -12px) rotate(-6deg); }
+        }
+
+        @keyframes planeGliding2 {
+            0%   { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(12px, -10px) rotate(8deg); }
+        }
+
+        /* ── Floating Sparkles ── */
+        .decor-sparkle {
+            position: absolute;
+            color: #ffffff;
+            font-size: 16px;
+            z-index: 3;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+            animation: sparkleBlink 3s ease-in-out infinite alternate;
+        }
+
+        .sparkle-1 { top: 12%; left: 14%; animation-delay: 0s; font-size: 20px; color: #bae6fd; }
+        .sparkle-2 { top: 20%; right: 26%; animation-delay: 1.2s; font-size: 16px; color: #ffffff; }
+        .sparkle-3 { bottom: 18%; left: 6%; animation-delay: 2s; font-size: 18px; color: #bfdbfe; }
+
+        @keyframes sparkleBlink {
+            0%   { transform: scale(0.7) rotate(0deg); opacity: 0.35; }
+            50%  { transform: scale(1.2) rotate(45deg); opacity: 1; }
+            100% { transform: scale(0.8) rotate(90deg); opacity: 0.4; }
+        }
+
+        /* ── Modern Floating Pills with Ambient Glow Shapes ── */
+        .hero-float-pill {
+            position: absolute;
+            z-index: 4;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            font-size: 10px;
-            font-weight: 600;
-            color: #047857;
-            background: #d1fae5;
-            padding: 3px 9px;
-            border-radius: 20px;
-        }
-
-        .pulsing-green-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
-            animation: dotBlink 1.8s infinite;
-        }
-
-        @keyframes dotBlink {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50%      { transform: scale(1.3); opacity: 0.6; }
-        }
-
-        .hub-card-body {
-            padding: 18px 20px;
-        }
-
-        .hub-lead-text {
-            font-size: 12.5px;
-            font-weight: 500;
-            color: var(--ink-body);
-            margin-bottom: 12px;
-        }
-
-        .hub-modules-grid {
-            display: grid;
-            gap: 9px;
-            margin-bottom: 14px;
-        }
-
-        .hub-module-item {
-            display: flex;
-            align-items: center;
             gap: 10px;
-            padding: 10px 12px;
-            border-radius: 12px;
-            background: #fbfdff;
-            border: 1px solid var(--border-soft);
-            transition: all .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            padding: 8px 14px;
+            border-radius: 16px;
+            box-shadow: 0 14px 30px -6px rgba(15, 23, 42, 0.16), 0 0 0 1.5px rgba(255, 255, 255, 0.9);
+            pointer-events: none;
         }
 
-        .hub-module-item:hover {
-            border-color: var(--sky-vibrant);
-            background: #f0f7ff;
-            transform: translateX(4px);
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        .pill-ambient-shape {
+            position: absolute;
+            inset: -4px;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.45;
+            filter: blur(8px);
+            animation: pillPulseGlow 3s ease-in-out infinite alternate;
         }
 
-        .module-icon-wrap {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-            color: var(--sky-dark);
+        .shape-emerald { background: linear-gradient(135deg, #10b981, #34d399); }
+        .shape-blue    { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+        .shape-purple  { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+
+        @keyframes pillPulseGlow {
+            0%   { transform: scale(0.96); opacity: 0.3; }
+            100% { transform: scale(1.05); opacity: 0.6; }
+        }
+
+        .pill-logbook {
+            top: 20%;
+            left: -4%;
+            animation: floatSubtle1 6s ease-in-out infinite alternate;
+        }
+
+        .pill-sidang {
+            top: 8%;
+            right: 0%;
+            animation: floatSubtle2 6.5s ease-in-out infinite alternate;
+        }
+
+        .pill-mitra {
+            bottom: 10%;
+            right: 0%;
+            animation: floatSubtle1 7s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatSubtle1 {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(-7px); }
+        }
+
+        @keyframes floatSubtle2 {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(7px); }
+        }
+
+        .float-pill-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
             display: grid;
             place-items: center;
             flex-shrink: 0;
-            transition: transform .25s ease;
+            position: relative;
         }
 
-        .hub-module-item:hover .module-icon-wrap {
-            transform: scale(1.1) rotate(-4deg);
-            color: var(--sky-primary);
+        .icon-emerald {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
         }
 
-        .module-info-wrap h4 {
-            font-size: 12.5px;
-            font-weight: 600;
-            color: var(--ink-headline);
-            line-height: 1.2;
-            margin-bottom: 2px;
+        .icon-blue {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
         }
 
-        .module-info-wrap p {
-            font-size: 11px;
-            font-weight: 400;
-            color: var(--ink-subtext);
+        .icon-purple {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.35);
         }
 
-        .module-badge-tag {
-            margin-left: auto;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--sky-dark);
-            background: #e0f2fe;
-            padding: 2.5px 8px;
-            border-radius: 6px;
-            white-space: nowrap;
-        }
-
-        .hub-card-footer {
-            padding: 11px 14px;
-            border-radius: 10px;
-            background: #f8fafc;
-            border: 1px solid var(--border-soft);
+        .float-pill-content {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .float-pill-title {
             font-size: 11.5px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.25;
         }
 
-        .hub-card-footer span {
+        .float-pill-desc {
+            font-size: 9.5px;
             font-weight: 500;
-            color: var(--ink-body);
-        }
-
-        .hub-card-footer a {
-            color: var(--sky-primary);
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: gap .2s ease;
-        }
-
-        .hub-card-footer a:hover {
-            color: var(--sky-dark);
-            gap: 6px;
+            color: #64748b;
+            line-height: 1.2;
         }
 
         /* ═══════════════════════════════════════════════════════════════
@@ -1227,6 +1291,12 @@
         @media (max-width: 680px) {
             .nav-menu a:not(.btn-nav-login) { display: none; }
             .hero-headline { font-size: 27px; }
+            .hero-illustration-stage { min-height: 340px; margin-top: 10px; }
+            .hero-students-img { max-width: 310px; }
+            .pill-logbook { left: 0%; top: 10%; }
+            .pill-sidang { right: 0%; top: 2%; }
+            .pill-mitra { right: 0%; bottom: 2%; }
+            .float-pill-desc { display: none; }
             .features-grid-refined { grid-template-columns: 1fr; }
             .timeline-row-layout { grid-template-columns: 1fr; }
             .network-stage-wrap { height: 320px; }
@@ -1316,95 +1386,76 @@
                     </div>
                 </div>
 
-                <!-- Right: White Floating Service Hub Card (Monopol Style) -->
-                <div class="system-hub-card pop-card reveal-node stagger-2">
-                    <div class="hub-card-header">
-                        <div class="hub-title-block">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
-                                <line x1="8" y1="21" x2="16" y2="21"></line>
-                                <line x1="12" y1="17" x2="12" y2="21"></line>
-                            </svg>
-                            <span>Layanan Terpadu SIMPUL Unila</span>
-                        </div>
-                        <div class="live-status-pill">
-                            <span class="pulsing-green-dot"></span>
-                            <span>Sistem Aktif</span>
+                <!-- Right: Hero Illustration - 2 Mahasiswa & Dynamic Animated Shapes -->
+                <div class="hero-illustration-stage reveal-node in-view stagger-2">
+                    <!-- Dynamic Ambient Aura & Rotating Halo Ring -->
+                    <div class="illustration-ambient-glow"></div>
+                    <div class="illustration-halo-ring"></div>
+
+                    <!-- Floating Sparkle Stars -->
+                    <span class="decor-sparkle sparkle-1">✦</span>
+                    <span class="decor-sparkle sparkle-2">✦</span>
+                    <span class="decor-sparkle sparkle-3">✦</span>
+
+                    <!-- Floating Animated Origami Paper Planes -->
+                    <div class="decor-paper-plane decor-plane-1">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z" fill="rgba(255,255,255,0.96)" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="decor-paper-plane decor-plane-2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z" fill="rgba(255,255,255,0.92)" stroke="#60a5fa" stroke-width="2" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Floating Badge: Logbook Terpantau (with Ambient Shape & Animated Ring) -->
+                    <div class="hero-float-pill pill-logbook">
+                        <div class="pill-ambient-shape shape-emerald"></div>
+                        <span class="float-pill-icon icon-emerald">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </span>
+                        <div class="float-pill-content">
+                            <span class="float-pill-title">Logbook Harian</span>
+                            <span class="float-pill-desc">Terpantau Pembimbing</span>
                         </div>
                     </div>
 
-                    <div class="hub-card-body">
-                        <p class="hub-lead-text">Pusat kendali proses akademik Kuliah Praktik mahasiswa:</p>
-
-                        <!-- 4 Modul Layanan Riil -->
-                        <div class="hub-modules-grid">
-                            <div class="hub-module-item">
-                                <div class="module-icon-wrap">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                    </svg>
-                                </div>
-                                <div class="module-info-wrap">
-                                    <h4>Direktori Mitra &amp; Kuota</h4>
-                                    <p>Aturan kuota: Maks 1 kelompok / 3 mahasiswa</p>
-                                </div>
-                                <span class="module-badge-tag">Tervalidasi</span>
-                            </div>
-
-                            <div class="hub-module-item">
-                                <div class="module-icon-wrap">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                        <path d="M12 20h9"></path>
-                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                                    </svg>
-                                </div>
-                                <div class="module-info-wrap">
-                                    <h4>Logbook Kegiatan Harian</h4>
-                                    <p>Pencatatan aktivitas kerja terpantau pembimbing</p>
-                                </div>
-                                <span class="module-badge-tag">Tersinkron</span>
-                            </div>
-
-                            <div class="hub-module-item">
-                                <div class="module-icon-wrap">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    </svg>
-                                </div>
-                                <div class="module-info-wrap">
-                                    <h4>Pemberkasan &amp; Laporan</h4>
-                                    <p>Surat pengantar, konfirmasi, &amp; draft naskah</p>
-                                </div>
-                                <span class="module-badge-tag">Terarsip</span>
-                            </div>
-
-                            <div class="hub-module-item">
-                                <div class="module-icon-wrap">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                        <circle cx="12" cy="8" r="7"></circle>
-                                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                                    </svg>
-                                </div>
-                                <div class="module-info-wrap">
-                                    <h4>Pendaftaran Sidang KP</h4>
-                                    <p>Validasi syarat kelulusan &amp; jadwal penguji</p>
-                                </div>
-                                <span class="module-badge-tag">Terintegrasi</span>
-                            </div>
-                        </div>
-
-                        <div class="hub-card-footer">
-                            <span>Ingin mengakses layanan sistem?</span>
-                            <a href="{{ route('login') }}">
-                                <span>Masuk Sekarang</span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                            </a>
+                    <!-- Floating Badge: Sidang KP (with Ambient Shape) -->
+                    <div class="hero-float-pill pill-sidang">
+                        <div class="pill-ambient-shape shape-blue"></div>
+                        <span class="float-pill-icon icon-blue">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                        <div class="float-pill-content">
+                            <span class="float-pill-title">Sidang KP</span>
+                            <span class="float-pill-desc">Tervalidasi &amp; Terjadwal</span>
                         </div>
                     </div>
+
+                    <!-- Floating Badge: Mitra KP (with Ambient Shape) -->
+                    <div class="hero-float-pill pill-mitra">
+                        <div class="pill-ambient-shape shape-purple"></div>
+                        <span class="float-pill-icon icon-purple">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        </span>
+                        <div class="float-pill-content">
+                            <span class="float-pill-title">Mitra KP Unila</span>
+                            <span class="float-pill-desc">Kuota &amp; Instansi Resmi</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Students Illustration -->
+                    <img 
+                        src="{{ asset('images/hero-students.png') }}" 
+                        alt="Ilustrasi Dua Mahasiswa Kuliah Praktik Universitas Lampung" 
+                        class="hero-students-img"
+                        width="460"
+                        height="460"
+                        loading="eager"
+                    >
                 </div>
 
             </section>

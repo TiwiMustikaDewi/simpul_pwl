@@ -84,4 +84,112 @@ class StudentPortalTest extends TestCase
             ->assertOk()
             ->assertSee('Terisi 1/3 Individu');
     }
+
+    public function test_student_can_view_application_form_with_editable_group_inputs(): void
+    {
+        $user = $this->createStudentUser('2417051034');
+        $this->actingAs($user);
+
+        $response = $this->get(route('mahasiswa.applications.create'));
+
+        $response->assertOk()
+            ->assertSee('Formulir Anggota Kelompok KP')
+            ->assertSee('name="leader_name"', false)
+            ->assertSee('name="leader_npm"', false)
+            ->assertSee('name="leader_major"', false)
+            ->assertSee('name="members[0][name]"', false)
+            ->assertSee('name="members[0][npm]"', false)
+            ->assertSee('name="members[0][major]"', false);
+    }
+
+    public function test_student_can_submit_group_application_with_custom_leader_and_members(): void
+    {
+        $user = $this->createStudentUser('2417051034');
+        $this->actingAs($user);
+
+        $payload = [
+            'type' => 'group',
+            'company_name' => 'PT Teknologi Masa Depan',
+            'company_city' => 'Bandar Lampung',
+            'company_address' => 'Jl. ZA Pagar Alam No. 99',
+            'company_contact' => 'HR Team',
+            'title' => 'KP Tim Pengembang Aplikasi Web',
+            'start_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'end_date' => Carbon::now()->addMonths(2)->format('Y-m-d'),
+            'group_name' => 'Tim Garuda Unila',
+            'leader_name' => 'Ahmad Ketua',
+            'leader_npm' => '2417051099',
+            'leader_major' => 'S1 Ilmu Komputer',
+            'members' => [
+                [
+                    'name' => 'Budi Anggota Satu',
+                    'npm' => '2417051088',
+                    'major' => 'S1 Ilmu Komputer',
+                ],
+                [
+                    'name' => 'Cici Anggota Dua',
+                    'npm' => '2417051077',
+                    'major' => 'D3 Manajemen Informatika',
+                ],
+            ],
+        ];
+
+        $response = $this->post(route('mahasiswa.applications.store'), $payload);
+
+        $response->assertRedirect(route('mahasiswa.dashboard'));
+
+        $this->assertDatabaseHas('internship_groups', [
+            'name' => 'Tim Garuda Unila',
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Ahmad Ketua',
+        ]);
+        $this->assertDatabaseHas('students', [
+            'npm' => '2417051099',
+            'major' => 'S1 Ilmu Komputer',
+        ]);
+
+        $this->assertDatabaseHas('students', [
+            'npm' => '2417051088',
+            'major' => 'S1 Ilmu Komputer',
+        ]);
+        $this->assertDatabaseHas('students', [
+            'npm' => '2417051077',
+            'major' => 'D3 Manajemen Informatika',
+        ]);
+    }
+
+    public function test_group_application_without_group_name_defaults_group_name(): void
+    {
+        $user = $this->createStudentUser('2417051034');
+        $this->actingAs($user);
+
+        $payload = [
+            'type' => 'group',
+            'company_name' => 'PT Solusi Cerdas',
+            'company_city' => 'Bandar Lampung',
+            'company_address' => 'Jl. Teuku Umar No. 1',
+            'start_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'end_date' => Carbon::now()->addMonths(2)->format('Y-m-d'),
+            'leader_name' => 'Faisal Pratama',
+            'leader_npm' => '2417051080',
+            'leader_major' => 'S1 Sistem Informasi',
+            'members' => [
+                [
+                    'name' => 'Dinda Putri',
+                    'npm' => '2417051081',
+                    'major' => 'D3 Manajemen Informatika',
+                ],
+            ],
+        ];
+
+        $response = $this->post(route('mahasiswa.applications.store'), $payload);
+
+        $response->assertRedirect(route('mahasiswa.dashboard'));
+
+        $this->assertDatabaseHas('internship_groups', [
+            'name' => 'Kelompok Faisal Pratama',
+        ]);
+    }
 }

@@ -9,8 +9,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/simpul-admin.css') }}">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 
     <style>
+        iconify-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: -0.15em;
+        }
+
         body, button, input, select, textarea {
             font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
@@ -73,7 +81,7 @@
 
             <span class="account-name">{{ auth()->user()->name }}</span>
 
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari akun Admin?');">
                 @csrf
                 <button type="submit" class="btn btn-outline">Logout</button>
             </form>
@@ -97,17 +105,21 @@
             @endforeach
 
             <div class="sidebar-note">
-                <div class="note-icon">🛠️</div>
+                <div class="note-icon">
+                    <iconify-icon icon="lucide:wrench" width="20" height="20" style="color: var(--brand-primary);"></iconify-icon>
+                </div>
                 <h3>Panduan Admin</h3>
                 <p>
                     Alur verifikasi berkas, penetapan dosen pembimbing,
                     dan penjadwalan sidang Kuliah Praktik.
                 </p>
-                <a href="{{ route('admin.applications.index') }}" class="btn btn-primary btn-full">Lihat Pengajuan →</a>
+                <a href="{{ route('admin.applications.index') }}" class="btn btn-primary btn-full">Lihat Pengajuan</a>
             </div>
 
             <div class="sidebar-profile" id="profil">
-                <div class="avatar">🧑🏻‍💼</div>
+                <div class="avatar" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; font-weight: 700; font-size: 14px; display: grid; place-items: center; border-radius: 50%;">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
                 <div class="profile-info">
                     <strong>{{ auth()->user()->name }}</strong>
                     <span>Admin Jurusan</span>

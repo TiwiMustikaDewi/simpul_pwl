@@ -6,6 +6,15 @@
     <title>@yield('title', 'Dashboard Dosen') | SIMPUL</title>
 
     <link rel="stylesheet" href="{{ asset('css/simpul-admin.css') }}">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <style>
+        iconify-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: -0.15em;
+        }
+    </style>
     @stack('styles')
 </head>
 <body>
@@ -76,7 +85,7 @@
 
             <span class="account-name">{{ auth()->user()->name }}</span>
 
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari akun Dosen?');">
                 @csrf
                 <button type="submit" class="btn btn-outline">Logout</button>
             </form>
@@ -148,7 +157,7 @@
                     Pantau aktivitas harian logbook, evaluasi laporan akhir,
                     serta berikan penilaian pada sidang Kuliah Praktik mahasiswa.
                 </p>
-                <a href="{{ route('dosen.logs.index') }}" class="btn btn-primary btn-full">Periksa Logbook →</a>
+                <a href="{{ route('dosen.logs.index') }}" class="btn btn-primary btn-full">Periksa Logbook</a>
             </div>
 
             <div class="sidebar-profile" id="profil">

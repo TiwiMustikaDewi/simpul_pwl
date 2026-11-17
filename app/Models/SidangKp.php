@@ -14,16 +14,20 @@ class SidangKp extends Model
 
     protected $fillable = [
         'internship_id',
+        'proposed_date',
         'sidang_date',
         'room',
+        'presentation_file',
         'status',
         'grade',
         'notes',
+        'student_notes',
     ];
 
     protected function casts(): array
     {
         return [
+            'proposed_date' => 'datetime',
             'sidang_date' => 'datetime',
         ];
     }
