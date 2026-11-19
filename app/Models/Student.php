@@ -15,6 +15,10 @@ class Student extends Model
     protected $fillable = [
         'user_id',
         'npm',
+<<<<<<< HEAD
+=======
+        'faculty',
+>>>>>>> af4810d (Update registrasi)
         'major',
         'phone',
     ];
@@ -36,12 +40,25 @@ class Student extends Model
 
     public function memberGroups(): BelongsToMany
     {
+<<<<<<< HEAD
         return $this->belongsToMany(InternshipGroup::class, 'internship_group_members', 'student_id', 'group_id')
             ->withTimestamps();
+=======
+        return $this->belongsToMany(
+            InternshipGroup::class,
+            'internship_group_members',
+            'student_id',
+            'group_id'
+        )->withTimestamps();
+>>>>>>> af4810d (Update registrasi)
     }
 
     public function experiences(): HasMany
     {
         return $this->hasMany(InternshipExperience::class);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> af4810d (Update registrasi)
