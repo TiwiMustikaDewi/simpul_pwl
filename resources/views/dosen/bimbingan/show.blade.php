@@ -35,8 +35,16 @@
         </div>
     @endif
 
+    <!-- QUICK JUMP PILLS -->
+    <div class="quick-nav-pills">
+        <a href="#info">📋 Informasi Pelaksanaan</a>
+        <a href="#logbook">📝 Logbook Harian ({{ $logs->count() }})</a>
+        <a href="#laporan">📄 Laporan Akhir ({{ $reports->count() }})</a>
+        <a href="#sidang">🎓 Sidang &amp; Nilai</a>
+    </div>
+
     <!-- DETAIL INFORMASI KP -->
-    <section class="panel workflow-panel" style="margin-bottom: 22px;">
+    <section class="panel workflow-panel" id="info" style="margin-bottom: 22px;">
         <div class="panel-title">
             <h2>Informasi Pelaksanaan Kuliah Praktik</h2>
             <span class="status-pill {{ $internship->status }}">
@@ -46,37 +54,37 @@
 
         <div class="detail-grid">
             <div class="detail-item">
-                <span class="label">Mahasiswa</span>
+                <span class="label">Mahasiswa Bimbingan</span>
                 <span class="val">{{ $internship->student_name }}</span>
-                <small style="color: var(--muted); font-size: 11px;">NPM: {{ $internship->npm }} · {{ $internship->major }}</small>
+                <small style="color: var(--muted); font-size: 11px; display: block; margin-top: 4px;">NPM: {{ $internship->npm }} · {{ $internship->major }}</small>
                 <small style="color: var(--muted); font-size: 11px; display: block;">Email: {{ $internship->student_email }}</small>
-                <small style="color: var(--muted); font-size: 11px; display: block;">No HP: {{ $internship->student_phone ?? '-' }}</small>
+                <small style="color: var(--muted); font-size: 11px; display: block;">No HP / WA: {{ $internship->student_phone ?? '-' }}</small>
             </div>
 
             <div class="detail-item">
-                <span class="label">Instansi / Perusahaan</span>
+                <span class="label">Instansi / Perusahaan Tempat KP</span>
                 <span class="val">{{ $internship->company_name }}</span>
-                <small style="color: var(--muted); font-size: 11px;">{{ $internship->company_address }}, {{ $internship->company_city }}</small>
+                <small style="color: var(--muted); font-size: 11px; display: block; margin-top: 4px;">{{ $internship->company_address }}, {{ $internship->company_city }}</small>
                 <small style="color: var(--muted); font-size: 11px; display: block;">Kontak: {{ $internship->company_contact ?? '-' }} ({{ $internship->company_phone ?? '-' }})</small>
             </div>
 
             <div class="detail-item">
-                <span class="label">Periode Pelaksanaan</span>
+                <span class="label">Periode &amp; Bentuk KP</span>
                 <span class="val">{{ \Carbon\Carbon::parse($internship->start_date)->locale('id')->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($internship->end_date)->locale('id')->translatedFormat('d M Y') }}</span>
-                <small style="color: var(--muted); font-size: 11px;">Tipe: {{ $internship->type === 'group' ? 'Kelompok' : 'Individu' }}</small>
+                <small style="color: var(--muted); font-size: 11px; display: block; margin-top: 4px;">Tipe: {{ $internship->type === 'group' ? 'Kelompok' : 'Individu' }}</small>
                 @if ($internship->group_id)
-                    <small style="color: var(--blue); font-size: 11px; display: block; font-weight: 700;">Grup: {{ $internship->group_name }}</small>
+                    <small style="color: var(--blue); font-size: 11px; display: block; font-weight: 700;">Kelompok: {{ $internship->group_name }}</small>
                 @endif
             </div>
         </div>
 
         @if ($internship->type === 'group' && count($groupMembers) > 0)
-            <div style="margin-top: 10px; padding: 12px; background: var(--blue-light); border-radius: 10px;">
+            <div style="margin-top: 10px; padding: 14px; background: var(--blue-light); border-radius: 12px;">
                 <strong style="color: var(--blue-dark); font-size: 11px;">Anggota Kelompok KP:</strong>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
                     @foreach ($groupMembers as $member)
-                        <span class="filter-pill" style="background: #fff;">
-                            {{ $member->name }} ({{ $member->npm }})
+                        <span class="filter-pill" style="background: #fff; font-size: 11px;">
+                            👤 {{ $member->name }} <span class="filter-count">{{ $member->npm }}</span>
                         </span>
                     @endforeach
                 </div>
@@ -85,11 +93,11 @@
     </section>
 
     <!-- SECTION 1: LOGBOOK -->
-    <section class="panel workflow-panel" style="margin-bottom: 22px;">
+    <section class="panel workflow-panel" id="logbook" style="margin-bottom: 22px;">
         <div class="panel-title">
             <h2>Logbook Harian Mahasiswa</h2>
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="small-badge">{{ $logs->count() }} Kegiatan</span>
+                <span class="small-badge">{{ $logs->count() }} Kegiatan Dicatat</span>
                 <a href="{{ route('dosen.logs.index', ['student_id' => $internship->id]) }}" class="text-link">Buka di menu Logbook →</a>
             </div>
         </div>
@@ -99,9 +107,9 @@
                 <div class="timeline-header">
                     <div>
                         <span class="timeline-date">
-                            {{ \Carbon\Carbon::parse($log->date)->locale('id')->translatedFormat('l, d F Y') }}
+                            📅 {{ \Carbon\Carbon::parse($log->date)->locale('id')->translatedFormat('l, d F Y') }}
                         </span>
-                        <h3 style="font-size: 13px; color: var(--blue-dark); margin-top: 3px;">
+                        <h3 style="font-size: 13px; color: var(--blue-dark); margin-top: 4px;">
                             {{ $log->activity }}
                         </h3>
                     </div>
@@ -121,7 +129,7 @@
                 </div>
 
                 <!-- Form Review Logbook -->
-                <details class="workflow-card" style="margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 10px;">
+                <details class="workflow-card" style="margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 12px;">
                     <summary>
                         <span class="btn btn-outline btn-sm">Beri Catatan / Ubah Status Logbook ▾</span>
                     </summary>
@@ -148,6 +156,7 @@
             </article>
         @empty
             <div class="empty-state">
+                <div style="font-size: 24px; margin-bottom: 6px;">📝</div>
                 <strong>Belum ada logbook kegiatan</strong>
                 Mahasiswa belum mengisi catatan logbook harian untuk Kuliah Praktik ini.
             </div>
@@ -155,10 +164,10 @@
     </section>
 
     <!-- SECTION 2: LAPORAN AKHIR -->
-    <section class="panel workflow-panel" style="margin-bottom: 22px;">
+    <section class="panel workflow-panel" id="laporan" style="margin-bottom: 22px;">
         <div class="panel-title">
             <h2>Laporan Akhir Kuliah Praktik</h2>
-            <span class="small-badge">{{ $reports->count() }} Berkas</span>
+            <span class="small-badge">{{ $reports->count() }} Berkas Diunggah</span>
         </div>
 
         @forelse ($reports as $report)
@@ -175,9 +184,17 @@
                     </span>
                 </div>
 
-                <div style="margin: 10px 0;">
+                <!-- Kartu Unduhan Berkas -->
+                <div class="doc-file-card">
+                    <div class="doc-file-meta">
+                        <div class="doc-file-icon">PDF</div>
+                        <div>
+                            <strong style="color: var(--blue-dark); font-size: 12px; display: block;">{{ $report->title }}</strong>
+                            <small style="color: var(--muted); font-size: 10px;">Berkas Laporan Mahasiswa</small>
+                        </div>
+                    </div>
                     <a href="{{ route('dosen.reports.download', $report->id) }}" class="btn btn-outline btn-sm">
-                        Unduh Berkas Laporan
+                        Unduh Berkas Laporan 📥
                     </a>
                 </div>
 
@@ -188,7 +205,7 @@
                 @endif
 
                 <!-- Form Review Laporan -->
-                <form action="{{ route('dosen.reports.review', $report->id) }}" method="POST" class="workflow-form form-grid" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);">
+                <form action="{{ route('dosen.reports.review', $report->id) }}" method="POST" class="workflow-form form-grid" style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);">
                     @csrf
                     <label class="form-field">
                         <span>Status Persetujuan Laporan</span>
@@ -200,7 +217,7 @@
 
                     <label class="form-field form-field-wide">
                         <span>Catatan Evaluasi / Masukan Perbaikan</span>
-                        <textarea name="feedback" rows="3" class="form-control" placeholder="Tuliskan catatan evaluasi laporan untuk mahasiswa...">{{ old('feedback', $report->feedback) }}</textarea>
+                        <textarea name="feedback" rows="3" class="form-control" placeholder="Tuliskan catatan evaluasi isi, sistematika penulisan, atau perbaikan bab...">{{ old('feedback', $report->feedback) }}</textarea>
                     </label>
 
                     <div class="form-field-wide form-actions">
@@ -210,14 +227,15 @@
             </article>
         @empty
             <div class="empty-state">
+                <div style="font-size: 24px; margin-bottom: 6px;">📄</div>
                 <strong>Belum ada laporan akhir diunggah</strong>
-                Mahasiswa belum mengunggah berkas laporan akhir KP.
+                Mahasiswa belum mengunggah berkas laporan akhir Kuliah Praktik.
             </div>
         @endforelse
     </section>
 
     <!-- SECTION 3: SIDANG KP & PENILAIAN -->
-    <section class="panel workflow-panel">
+    <section class="panel workflow-panel" id="sidang">
         <div class="panel-title">
             <h2>Sidang Kuliah Praktik &amp; Penilaian</h2>
             @if ($sidang)
@@ -245,19 +263,32 @@
                     <span class="val">{{ $sidang->room ?? 'TBA (Belum ditentukan)' }}</span>
                 </div>
 
-                <div class="detail-item">
-                    <span class="label">Nilai Akhir Sidang</span>
-                    <span class="val" style="font-size: 16px; color: var(--green);">
-                        {{ $sidang->grade ?? 'Belum Dinilai' }}
-                    </span>
+                <div class="detail-item" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <span class="label">Nilai Akhir Sidang</span>
+                        <span class="val" style="font-size: 13px; color: var(--blue-dark);">
+                            {{ $sidang->grade ? 'Telah Diberikan Nilai' : 'Belum Dinilai' }}
+                        </span>
+                    </div>
+                    @if ($sidang->grade)
+                        <div class="grade-ribbon-lg">{{ $sidang->grade }}</div>
+                    @endif
                 </div>
             </div>
 
             @if ($sidang->notes)
                 <div class="review-note" style="margin-bottom: 16px;">
-                    <strong>Catatan Sidang:</strong> {{ $sidang->notes }}
+                    <strong>Catatan Sidang / Berita Acara:</strong> {{ $sidang->notes }}
                 </div>
             @endif
+
+            <!-- Rubrik Pedoman Nilai -->
+            <div class="rubric-box">
+                <strong style="color: var(--blue-dark); font-size: 11px; display: block; margin-bottom: 4px;">Pedoman Konversi Nilai Sidang KP:</strong>
+                <p style="font-size: 11px; color: #536783; line-height: 1.7;">
+                    Rentang Nilai: <strong>A</strong> (&ge; 80) · <strong>A-</strong> (76–79) · <strong>B+</strong> (71–75) · <strong>B</strong> (66–70) · <strong>B-</strong> (61–65) · <strong>C</strong> (55–60).
+                </p>
+            </div>
 
             <!-- Form Penilaian Sidang -->
             <form action="{{ route('dosen.sidang.grade', $sidang->id) }}" method="POST" class="workflow-form form-grid" style="border-top: 1px dashed var(--border); padding-top: 16px;">
@@ -298,6 +329,7 @@
             </form>
         @else
             <div class="empty-state">
+                <div style="font-size: 24px; margin-bottom: 6px;">🎓</div>
                 <strong>Mahasiswa belum mengajukan sidang KP</strong>
                 Pengajuan sidang akan diajukan mahasiswa setelah laporan selesai dan logbook mencukupi.
             </div>
