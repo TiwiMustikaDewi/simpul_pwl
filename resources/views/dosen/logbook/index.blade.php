@@ -31,6 +31,30 @@
         </div>
     @endif
 
+    <!-- RINGKASAN METRIK LOGBOOK -->
+    <div class="stat-grid" style="margin-bottom: 20px;">
+        <div class="stat-card blue">
+            <div class="stat-number">{{ number_format($counts['all']) }}</div>
+            <div class="stat-label">Total Logbook</div>
+            <div class="stat-hint">Seluruh catatan kegiatan</div>
+        </div>
+        <div class="stat-card yellow">
+            <div class="stat-number">{{ number_format($counts['submitted']) }}</div>
+            <div class="stat-label">Menunggu Review</div>
+            <div class="stat-hint">Perlu tindakan dosen</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-number">{{ number_format($counts['approved']) }}</div>
+            <div class="stat-label">Disetujui</div>
+            <div class="stat-hint">Kegiatan valid &amp; diverifikasi</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-number">{{ number_format($counts['revision']) }}</div>
+            <div class="stat-label">Perlu Revisi</div>
+            <div class="stat-hint">Menunggu perbaikan mahasiswa</div>
+        </div>
+    </div>
+
     <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="filter-group">
@@ -80,20 +104,25 @@
         @forelse ($logs as $log)
             <article class="panel workflow-panel searchable-card">
                 <div class="workflow-card-heading">
-                    <div>
-                        <span class="timeline-date">
-                            {{ \Carbon\Carbon::parse($log->date)->locale('id')->translatedFormat('l, d F Y') }}
-                        </span>
-                        <h2 style="margin-top: 4px;">{{ $log->student_name }} · {{ $log->npm }}</h2>
-                        <p><strong>Aktivitas:</strong> {{ $log->activity }}</p>
-                        <small style="color: var(--muted);">Tempat KP: {{ $log->company_name }} · "{{ $log->internship_title }}"</small>
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <div class="mini-avatar">
+                            {{ strtoupper(mb_substr($log->student_name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <span class="timeline-date">
+                                📅 {{ \Carbon\Carbon::parse($log->date)->locale('id')->translatedFormat('l, d F Y') }}
+                            </span>
+                            <h2 style="margin-top: 3px; font-size: 14px;">{{ $log->student_name }} · <span style="color: var(--muted); font-size: 12px;">{{ $log->npm }}</span></h2>
+                            <p style="margin-top: 2px;"><strong>Aktivitas:</strong> <span style="color: var(--blue-dark); font-weight: 700;">{{ $log->activity }}</span></p>
+                            <small style="color: var(--muted); display: block; margin-top: 2px;">Tempat KP: {{ $log->company_name }} · "{{ $log->internship_title }}"</small>
+                        </div>
                     </div>
                     <span class="status-pill {{ $log->status }}">
                         {{ ['submitted' => 'Menunggu review', 'approved' => 'Disetujui', 'revision' => 'Perlu revisi'][$log->status] ?? $log->status }}
                     </span>
                 </div>
 
-                <div style="margin-top: 14px; padding: 14px; background: #fbfdff; border: 1px solid var(--border); border-radius: 10px; font-size: 11px; line-height: 1.8; color: var(--text);">
+                <div style="margin-top: 14px; padding: 14px; background: #fbfdff; border: 1px solid var(--border); border-radius: 12px; font-size: 11px; line-height: 1.8; color: var(--text);">
                     <strong style="color: var(--blue-dark); display: block; margin-bottom: 4px;">Uraian Kegiatan:</strong>
                     <div style="white-space: pre-line;">{{ $log->description }}</div>
                 </div>
@@ -107,7 +136,7 @@
                 <form action="{{ route('dosen.logs.review', $log->id) }}" method="POST" class="workflow-form form-grid" style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);">
                     @csrf
                     <label class="form-field">
-                        <span>Status Keputusan</span>
+                        <span>Keputusan Pemeriksaan Logbook</span>
                         <select name="status" class="form-control" required>
                             <option value="approved" {{ $log->status === 'approved' ? 'selected' : '' }}>✓ Setujui Kegiatan</option>
                             <option value="revision" {{ $log->status === 'revision' ? 'selected' : '' }}>⚠ Minta Revisi Kegiatan</option>
@@ -116,7 +145,7 @@
 
                     <label class="form-field form-field-wide">
                         <span>Catatan / Umpan Balik Dosen Pembimbing</span>
-                        <textarea name="supervisor_note" rows="2" class="form-control" placeholder="Tuliskan catatan arahan, masukan atau koreksi...">{{ old('supervisor_note', $log->supervisor_note) }}</textarea>
+                        <textarea name="supervisor_note" rows="2" class="form-control" placeholder="Tuliskan catatan arahan, masukan atau koreksi untuk mahasiswa...">{{ old('supervisor_note', $log->supervisor_note) }}</textarea>
                     </label>
 
                     <div class="form-field-wide form-actions">
@@ -126,6 +155,7 @@
             </article>
         @empty
             <div class="panel empty-state">
+                <div style="font-size: 24px; margin-bottom: 6px;">📝</div>
                 <strong>Tidak ada logbook kegiatan</strong>
                 Tidak ada data logbook yang sesuai dengan kriteria filter saat ini.
             </div>
