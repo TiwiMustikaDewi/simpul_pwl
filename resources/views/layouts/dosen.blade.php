@@ -5,8 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard Dosen') | SIMPUL</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/simpul-admin.css') }}">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <style>
+        iconify-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: -0.15em;
+        }
+
+        body, button, input, select, textarea {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+
         /* =========================================================
            SIMPUL — Ekstensi UI Khusus Role Dosen Pembimbing
            Mengadopsi token warna, tipografi, dan gaya SIMPUL
@@ -269,7 +284,7 @@
                 </div>
             </a>
 
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari akun Dosen?');">
                 @csrf
                 <button type="submit" class="btn btn-outline" title="Keluar dari akun">Logout</button>
             </form>
