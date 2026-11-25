@@ -3,24 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class AuthController extends Controller
 {
-    // =========================
-    // LOGIN
-    // =========================
-
+    /**
+     * Menampilkan halaman login.
+     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
+    /**
+     * Proses login pengguna.
+     */
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -34,10 +38,7 @@ class AuthController extends Controller
             'password' => $validated['password'],
         ];
 
-        if (! Auth::attempt(
-            $credentials,
-            $request->boolean('remember')
-        )) {
+        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors([
                     'email' => 'Email atau password tidak sesuai.',
@@ -47,8 +48,11 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        // Memastikan role yang dipilih sesuai dengan akun.
         if ($user->role !== $validated['role']) {
             Auth::logout();
+
+            $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return back()
@@ -58,12 +62,10 @@ class AuthController extends Controller
                 ->withInput($request->only('email', 'role'));
         }
 
-        if (! in_array(
-            $user->role,
-            ['student', 'admin', 'supervisor'],
-            true
-        )) {
+        // Memastikan role akun dikenali.
+        if (!in_array($user->role, ['student', 'admin', 'supervisor'], true)) {
             Auth::logout();
+
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
@@ -76,93 +78,163 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')
+        return redirect()
+            ->route('dashboard')
             ->with('success', 'Login berhasil. Selamat datang di SIMPUL!');
     }
 
-    // =========================
-    // REGISTER
-    // =========================
-
+    /**
+     * Menampilkan halaman registrasi.
+     */
     public function showRegister()
     {
         return view('auth.register');
     }
 
+    /**
+     * Proses registrasi mahasiswa.
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'npm' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:students,npm',
+            ],
+
+            'faculty' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'major' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'phone' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
             'email' => [
                 'required',
                 'email',
                 'max:255',
                 'unique:users,email',
             ],
+
             'password' => [
                 'required',
                 'confirmed',
                 PasswordRule::min(8),
             ],
+
             'role' => [
                 'required',
                 'in:student,admin,supervisor',
             ],
         ]);
 
+        // Registrasi mandiri hanya diperbolehkan untuk mahasiswa.
         if ($validated['role'] !== 'student') {
             return back()
                 ->withErrors([
                     'role' => 'Akun Admin Jurusan dan Dosen Pembimbing harus dibuat oleh pihak berwenang.',
                 ])
                 ->withInput(
-                    $request->except(
-                        'password',
-                        'password_confirmation'
-                    )
+                    $request->except('password', 'password_confirmation')
                 );
         }
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'student',
-        ]);
+        try {
+            // Membuat akun dan profil mahasiswa dalam satu transaksi.
+            $user = DB::transaction(function () use ($validated) {
 
-        Auth::login($user);
-        $request->session()->regenerate();
+                // Membuat akun pengguna.
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'role' => 'student',
+                ]);
 
-        return redirect()->route('dashboard')
-            ->with(
-                'success',
-                'Registrasi mahasiswa berhasil. Selamat datang di SIMPUL!'
-            );
+                // Membuat profil mahasiswa.
+                Student::create([
+                    'user_id' => $user->id,
+                    'npm' => $validated['npm'],
+                    'faculty' => $validated['faculty'],
+                    'major' => $validated['major'],
+                    'phone' => $validated['phone'] ?? null,
+                ]);
+
+                return $user;
+            });
+
+            // Login otomatis setelah registrasi berhasil.
+            Auth::login($user);
+
+            $request->session()->regenerate();
+
+            return redirect()
+                ->route('dashboard')
+                ->with(
+                    'success',
+                    'Registrasi mahasiswa berhasil. Selamat datang di SIMPUL!'
+                );
+
+        } catch (\Illuminate\Database\QueryException $e) {
+
+            return back()
+                ->withErrors([
+                    'npm' => 'Registrasi gagal. NPM atau email mungkin sudah terdaftar.',
+                ])
+                ->withInput(
+                    $request->except('password', 'password_confirmation')
+                );
+        }
     }
 
+    /**
+     * Mengarahkan pengguna ke dashboard sesuai role.
+     */
     public function dashboard()
     {
         $user = Auth::user();
 
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
         return match ($user->role) {
             'admin' => redirect()->route('admin.dashboard'),
             'supervisor' => redirect()->route('dosen.dashboard'),
-            'student' => view('dashboard'),
+            'student' => redirect()->route('mahasiswa.dashboard'),
+<<<<<<< HEAD
             default => abort(
                 403,
                 'Role akun tidak memiliki akses.'
             ),
+=======
+            default => abort(403, 'Role akun tidak memiliki akses.'),
+>>>>>>> af4810d (Update registrasi)
         };
     }
 
-    // =========================
-    // LOGOUT
-    // =========================
-
+    /**
+     * Proses logout.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -170,19 +242,22 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')
+        return redirect()
+            ->route('login')
             ->with('success', 'Kamu berhasil logout.');
     }
 
-    // =========================
-    // LUPA PASSWORD
-    // =========================
-
+    /**
+     * Menampilkan halaman lupa password.
+     */
     public function showForgotPassword()
     {
         return view('auth.forgot-password');
     }
 
+    /**
+     * Mengirimkan link reset password.
+     */
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -205,24 +280,20 @@ class AuthController extends Controller
         ]);
     }
 
-    // =========================
-    // TAMPILAN RESET PASSWORD
-    // =========================
-
-    public function showResetPassword(
-        Request $request,
-        string $token
-    ) {
+    /**
+     * Menampilkan halaman reset password.
+     */
+    public function showResetPassword(Request $request, string $token)
+    {
         return view('auth.reset-password', [
             'token' => $token,
             'email' => $request->query('email', ''),
         ]);
     }
 
-    // =========================
-    // PROSES RESET PASSWORD
-    // =========================
-
+    /**
+     * Memproses perubahan password.
+     */
     public function resetPassword(Request $request)
     {
         $validated = $request->validate([
@@ -238,6 +309,7 @@ class AuthController extends Controller
         $status = Password::reset(
             $validated,
             function (User $user, string $password) {
+
                 $user->forceFill([
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
@@ -246,7 +318,8 @@ class AuthController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            return redirect()->route('login')
+            return redirect()
+                ->route('login')
                 ->with(
                     'success',
                     'Password berhasil diubah. Silakan login dengan password baru.'
@@ -257,8 +330,6 @@ class AuthController extends Controller
             ->withErrors([
                 'email' => __($status),
             ])
-            ->withInput(
-                $request->only('email')
-            );
+            ->withInput($request->only('email'));
     }
 }

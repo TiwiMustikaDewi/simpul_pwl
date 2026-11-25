@@ -22,10 +22,7 @@
             font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
 
-        /* =========================================================
-           SIMPUL — Ekstensi UI Khusus Role Dosen Pembimbing
-           Mengadopsi token warna, tipografi, dan gaya SIMPUL
-           ========================================================= */
+      
 
         /* Transisi halus & elevasi kartu */
         .panel {
@@ -356,7 +353,7 @@
                     Pantau aktivitas harian logbook, evaluasi laporan akhir,
                     serta berikan penilaian pada sidang Kuliah Praktik mahasiswa.
                 </p>
-                <a href="{{ route('dosen.logs.index') }}" class="btn btn-primary btn-full">Periksa Logbook →</a>
+                <a href="{{ route('dosen.logs.index') }}" class="btn btn-primary btn-full">Periksa Logbook</a>
             </div>
 
             <div class="sidebar-profile" id="profil">

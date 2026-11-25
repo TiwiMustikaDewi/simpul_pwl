@@ -400,6 +400,9 @@ class WorkflowController extends Controller
             ->orderBy('sidang_kps.sidang_date')
             ->get([
                 'sidang_kps.id',
+                'sidang_kps.proposed_date',
+                'sidang_kps.presentation_file',
+                'sidang_kps.student_notes',
                 'sidang_kps.sidang_date',
                 'sidang_kps.room',
                 'sidang_kps.status',

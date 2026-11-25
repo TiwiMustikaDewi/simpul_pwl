@@ -9,6 +9,14 @@ use App\Http\Controllers\Dosen\LogbookController as DosenLogbookController;
 use App\Http\Controllers\Dosen\ProfileController as DosenProfileController;
 use App\Http\Controllers\Dosen\ReportController as DosenReportController;
 use App\Http\Controllers\Dosen\SidangController as DosenSidangController;
+use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
+use App\Http\Controllers\Student\CompanyController as StudentCompanyController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\ExperienceController as StudentExperienceController;
+use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
+use App\Http\Controllers\Student\NotificationController as StudentNotificationController;
+use App\Http\Controllers\Student\ReportController as StudentReportController;
+use App\Http\Controllers\Student\SidangController as StudentSidangController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -95,6 +103,60 @@ Route::middleware(['auth', 'role:admin'])
         Route::patch('/pengalaman/{experience}/validasi', [AdminWorkflowController::class, 'validateExperience'])
             ->whereNumber('experience')
             ->name('experiences.validate');
+    });
+
+Route::middleware(['auth', 'role:student'])
+    ->prefix('mahasiswa')
+    ->name('mahasiswa.')
+    ->group(function () {
+        Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
+
+        // Eksplorasi Perusahaan & Rekam Jejak Alumni
+        Route::get('/perusahaan', [StudentCompanyController::class, 'index'])->name('companies.index');
+        Route::get('/perusahaan/{company}', [StudentCompanyController::class, 'show'])
+            ->whereNumber('company')
+            ->name('companies.show');
+
+        // Pengajuan Kesiapan KP
+        Route::get('/pengajuan', [StudentApplicationController::class, 'create'])->name('applications.create');
+        Route::post('/pengajuan', [StudentApplicationController::class, 'store'])->name('applications.store');
+        Route::post('/pengajuan/{internship}/konfirmasi-diterima', [StudentApplicationController::class, 'confirmAcceptance'])
+            ->whereNumber('internship')
+            ->name('applications.confirm-acceptance');
+        Route::post('/pengajuan/{internship}/batal', [StudentApplicationController::class, 'cancel'])
+            ->whereNumber('internship')
+            ->name('applications.cancel');
+
+        // Logbook Harian
+        Route::get('/logbook', [StudentLogbookController::class, 'index'])->name('logbook.index');
+        Route::post('/logbook', [StudentLogbookController::class, 'store'])->name('logbook.store');
+        Route::put('/logbook/{log}', [StudentLogbookController::class, 'update'])
+            ->whereNumber('log')
+            ->name('logbook.update');
+
+        // Laporan Akhir KP
+        Route::get('/laporan', [StudentReportController::class, 'index'])->name('reports.index');
+        Route::post('/laporan', [StudentReportController::class, 'store'])->name('reports.store');
+
+        // Pendaftaran Sidang KP
+        Route::get('/sidang', [StudentSidangController::class, 'index'])->name('sidang.index');
+        Route::post('/sidang', [StudentSidangController::class, 'store'])->name('sidang.store');
+
+        // Ulasan Pengalaman Alumni
+        Route::get('/pengalaman', [StudentExperienceController::class, 'index'])->name('experiences.index');
+        Route::get('/pengalaman/tulis', [StudentExperienceController::class, 'create'])->name('experiences.create');
+        Route::post('/pengalaman', [StudentExperienceController::class, 'store'])->name('experiences.store');
+
+        // Pusat Notifikasi Mahasiswa
+        Route::get('/notifikasi', [StudentNotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('/notifikasi/{notification}/baca', [StudentNotificationController::class, 'markAsRead'])
+            ->whereNumber('notification')
+            ->name('notifications.read');
+        Route::post('/notifikasi/baca-semua', [StudentNotificationController::class, 'markAllAsRead'])
+            ->name('notifications.read-all');
+        Route::delete('/notifikasi/{notification}', [StudentNotificationController::class, 'destroy'])
+            ->whereNumber('notification')
+            ->name('notifications.destroy');
     });
 
 Route::middleware(['auth', 'role:supervisor'])
