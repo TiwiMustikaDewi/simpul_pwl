@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class AdminWorkflowTest extends TestCase
         $this->actingAs($this->createUser('admin'));
 
         $pages = [
-            'admin.dashboard' => 'Dashboard Admin Jurusan',
+            'admin.dashboard' => 'Ringkasan Data',
             'admin.pengguna.index' => 'Data Mahasiswa & Dosen',
             'admin.companies.index' => 'Tambah perusahaan',
             'admin.applications.index' => 'Verifikasi Pengajuan',
@@ -29,6 +30,313 @@ class AdminWorkflowTest extends TestCase
         foreach ($pages as $route => $content) {
             $this->get(route($route))->assertOk()->assertSee($content);
         }
+    }
+
+    public function test_admin_dashboard_and_workflow_pages_render_without_breadcrumbs(): void
+    {
+        $this->actingAs($this->createUser('admin'));
+
+        $this->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Ringkasan Data')
+            ->assertDontSee('Dashboard Admin Jurusan')
+            ->assertDontSee('class="breadcrumb"', false)
+            ->assertDontSee('SIMPUL / Dashboard Admin');
+
+        $this->get(route('admin.companies.index'))
+            ->assertOk()
+            ->assertSee('Data Perusahaan')
+            ->assertDontSee('class="breadcrumb"', false)
+            ->assertDontSee('SIMPUL / Admin / Data Perusahaan');
+    }
+
+    public function test_admin_header_matches_student_brand_and_profile_layout(): void
+    {
+        $admin = $this->createUser('admin');
+
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Portal Admin · Universitas Lampung')
+            ->assertSee('href="'.route('admin.notifications.index').'"', false)
+            ->assertSee('<iconify-icon icon="lucide:bell" width="20" height="20" aria-hidden="true"></iconify-icon>', false)
+            ->assertSee('<div class="header-avatar">'.strtoupper(substr($admin->name, 0, 1)).'</div>', false)
+            ->assertSee($admin->name)
+            ->assertSee('Admin Jurusan')
+            ->assertDontSee('dashboardSearch')
+            ->assertDontSee('Cari mahasiswa, perusahaan, atau pengajuan');
+    }
+
+    public function test_admin_notification_center_shows_owned_notifications_and_unread_count(): void
+    {
+        $admin = $this->createUser('admin');
+        $notification = Notification::create([
+            'user_id' => $admin->id,
+            'title' => 'Pengajuan KP Baru',
+            'message' => 'Mahasiswa mengajukan permohonan KP.',
+            'is_read' => false,
+        ]);
+        DB::table('notifications')
+            ->where('id', $notification->id)
+            ->update(['created_at' => '2026-11-26 05:24:00']);
+        Notification::create([
+            'user_id' => $this->createUser('admin')->id,
+            'title' => 'Notifikasi Milik Admin Lain',
+            'message' => 'Konten privat.',
+            'is_read' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.notifications.index'))
+            ->assertOk()
+            ->assertSee('Pusat Notifikasi &amp; Pemberitahuan', false)
+            ->assertSee('Pengajuan KP Baru')
+            ->assertSee('Mahasiswa mengajukan permohonan KP.')
+            ->assertSee('26 Nov 2026, 12:24 WIB')
+            ->assertSee('notification-tab-count is-unread', false)
+            ->assertDontSee('Notifikasi Milik Admin Lain')
+            ->assertSee('class="header-icon admin-notification-btn is-active"', false)
+            ->assertSee('notification-read-all', false);
+    }
+
+    public function test_admin_can_filter_notifications_and_mark_all_as_read(): void
+    {
+        $admin = $this->createUser('admin');
+        Notification::create([
+            'user_id' => $admin->id,
+            'title' => 'Notifikasi Belum Dibaca',
+            'message' => 'Pengajuan baru.',
+            'is_read' => false,
+        ]);
+        Notification::create([
+            'user_id' => $admin->id,
+            'title' => 'Notifikasi Sudah Dibaca',
+            'message' => 'Pengajuan sebelumnya.',
+            'is_read' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.notifications.index', ['filter' => 'unread']))
+            ->assertOk()
+            ->assertSee('Notifikasi Belum Dibaca')
+            ->assertDontSee('Notifikasi Sudah Dibaca');
+
+        $this->post(route('admin.notifications.read-all'))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $admin->id,
+            'title' => 'Notifikasi Belum Dibaca',
+            'is_read' => true,
+        ]);
+    }
+
+    public function test_admin_can_mark_owned_notification_as_read_and_delete_it(): void
+    {
+        $admin = $this->createUser('admin');
+        $notification = Notification::create([
+            'user_id' => $admin->id,
+            'title' => 'Pengajuan KP Baru',
+            'message' => 'Mahasiswa mengajukan permohonan KP.',
+            'is_read' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.notifications.read', $notification))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('notifications', [
+            'id' => $notification->id,
+            'is_read' => true,
+        ]);
+
+        $this->delete(route('admin.notifications.destroy', $notification))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('notifications', ['id' => $notification->id]);
+    }
+
+    public function test_admin_cannot_access_another_users_notification(): void
+    {
+        $admin = $this->createUser('admin');
+        $otherUser = $this->createUser('admin');
+        $notification = Notification::create([
+            'user_id' => $otherUser->id,
+            'title' => 'Notifikasi Pribadi',
+            'message' => 'Tidak boleh diakses admin lain.',
+            'is_read' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.notifications.read', $notification))
+            ->assertNotFound();
+
+        $this->delete(route('admin.notifications.destroy', $notification))
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('notifications', [
+            'id' => $notification->id,
+            'user_id' => $otherUser->id,
+            'is_read' => false,
+        ]);
+    }
+
+    public function test_student_cannot_access_admin_notification_center(): void
+    {
+        $this->actingAs($this->createUser('student'))
+            ->get(route('admin.notifications.index'))
+            ->assertForbidden();
+    }
+
+    public function test_admin_guide_is_removed_from_the_dashboard_content(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertDontSee('<section class="panel admin-guide">', false)
+            ->assertDontSee('Panduan Admin')
+            ->assertSee('Status KP')
+            ->assertSee('Sidang KP')
+            ->assertDontSee('<div class="sidebar-note">', false);
+    }
+
+    public function test_admin_dashboard_does_not_render_pending_action_section(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertDontSee('id="perlu-tindakan"', false)
+            ->assertDontSee('Perlu Tindakan')
+            ->assertDontSee('Belum ada pengajuan')
+            ->assertSee('Menunggu Verifikasi');
+    }
+
+    public function test_admin_welcome_banner_does_not_render_the_review_button(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('<section class="welcome-banner">', false)
+            ->assertSee('Selamat datang,')
+            ->assertDontSee('Tinjau Pengajuan');
+    }
+
+    public function test_admin_company_sections_use_the_company_group_icon(): void
+    {
+        $response = $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk();
+
+        $this->assertSame(3, substr_count($response->getContent(), 'icon="uix-sharp:company-group"'));
+    }
+
+    public function test_admin_verification_sections_use_the_receipt_verification_icon(): void
+    {
+        $response = $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Verifikasi Pengajuan')
+            ->assertSee('Menunggu Verifikasi');
+
+        $this->assertSame(3, substr_count($response->getContent(), 'icon="carbon:receipt-verification"'));
+    }
+
+    public function test_admin_group_menu_and_service_use_the_users_three_icon(): void
+    {
+        $response = $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Kelompok & Pembimbing');
+
+        $this->assertSame(2, substr_count($response->getContent(), 'icon="uix-sharp:users-three"'));
+    }
+
+    public function test_admin_sidang_menu_and_service_use_the_calendar_clock_icon(): void
+    {
+        $response = $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('<h3>Sidang KP</h3>', false)
+            ->assertDontSee('<h2>Sidang KP</h2>', false);
+
+        $this->assertSame(2, substr_count($response->getContent(), 'icon="lucide:calendar-clock"'));
+    }
+
+    public function test_admin_monitoring_menu_uses_the_heart_rate_monitor_icon(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee(
+                '<iconify-icon icon="tabler:heart-rate-monitor" width="18" height="18" aria-hidden="true"></iconify-icon>',
+                false
+            )
+            ->assertSee('Monitoring KP');
+    }
+
+    public function test_admin_experience_validation_menu_uses_the_list_check_icon(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee(
+                '<iconify-icon icon="tabler:list-check" width="18" height="18" aria-hidden="true"></iconify-icon>',
+                false
+            )
+            ->assertSee('Validasi Pengalaman');
+    }
+
+    public function test_admin_student_and_supervisor_menu_uses_the_document_search_icon(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee(
+                '<iconify-icon icon="icon-park-outline:doc-search-two" width="18" height="18" aria-hidden="true"></iconify-icon>',
+                false
+            )
+            ->assertSee('Data Mahasiswa & Dosen');
+    }
+
+    public function test_admin_supervisor_summary_uses_the_classroom_icon(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee(
+                '<iconify-icon icon="uix-sharp:classroom" width="24" height="24" aria-hidden="true"></iconify-icon>',
+                false
+            )
+            ->assertSee('Dosen Pembimbing');
+    }
+
+    public function test_admin_student_summary_uses_the_graduation_cap_icon(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee(
+                '<iconify-icon icon="lucide:graduation-cap" width="24" height="24" aria-hidden="true"></iconify-icon>',
+                false
+            )
+            ->assertSee('Mahasiswa');
+    }
+
+    public function test_admin_logout_form_is_in_the_sidebar_instead_of_the_topbar(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('<div class="sidebar-footer">', false)
+            ->assertSee('action="'.route('logout').'"', false)
+            ->assertSee('class="sidebar-logout-form"', false)
+            ->assertSee('id="adminLogoutModal"', false)
+            ->assertSee('Konfirmasi Keluar Akun')
+            ->assertSee('Anda harus login kembali untuk mengakses portal admin.')
+            ->assertDontSee('return confirm(', false)
+            ->assertSee('<button type="submit" class="sidebar-logout-btn">', false)
+            ->assertSee('class="header-icon admin-notification-btn"', false)
+            ->assertDontSee('<button type="submit" class="btn btn-outline">Logout</button>', false);
     }
 
     public function test_student_cannot_open_admin_workflow_pages(): void
@@ -157,6 +465,14 @@ class AdminWorkflowTest extends TestCase
             'group_id' => $groupId,
             'type' => 'group',
         ]);
+        DB::table('internships')
+            ->whereIn('id', [$internshipId, $groupMemberInternshipId])
+            ->update(['supervisor_name' => 'Nama Pembimbing Sebelumnya']);
+
+        $this->get(route('admin.groups.index'))
+            ->assertOk()
+            ->assertSee('name="supervisor_id"', false)
+            ->assertSee('value="'.$supervisorId.'"', false);
 
         $this->post(route('admin.groups.assign-supervisor', $internshipId), [
             'supervisor_id' => $supervisorId,
@@ -165,19 +481,35 @@ class AdminWorkflowTest extends TestCase
         $this->assertDatabaseHas('internships', [
             'id' => $internshipId,
             'supervisor_id' => $supervisorId,
+            'supervisor_name' => null,
         ]);
         $this->assertDatabaseHas('internships', [
             'id' => $groupMemberInternshipId,
             'supervisor_id' => $supervisorId,
+            'supervisor_name' => null,
         ]);
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $supervisor->id,
+            'title' => 'Penugasan Pembimbing KP',
+            'is_read' => false,
+        ]);
+        $notificationMessage = DB::table('notifications')
+            ->where('user_id', $supervisor->id)
+            ->value('message');
+        $this->assertStringContainsString('Kelompok A', $notificationMessage);
+        $this->assertStringContainsString('Praktik Pengembangan Sistem', $notificationMessage);
 
         $this->get(route('admin.groups.index'))
             ->assertOk()
             ->assertSee('Kelompok A')
             ->assertSee($supervisor->name);
+        $this->get(route('admin.applications.index'))
+            ->assertOk()
+            ->assertSee($supervisor->name);
         $this->get(route('admin.monitoring.index'))
             ->assertOk()
-            ->assertSee('Praktik Pengembangan Sistem');
+            ->assertSee('Praktik Pengembangan Sistem')
+            ->assertSee($supervisor->name);
     }
 
     public function test_admin_can_schedule_a_submitted_sidang(): void

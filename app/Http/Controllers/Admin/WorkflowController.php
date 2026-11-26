@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -218,6 +219,7 @@ class WorkflowController extends Controller
 
         $supervisors = DB::table('supervisors')
             ->join('users', 'users.id', '=', 'supervisors.user_id')
+            ->where('users.role', 'supervisor')
             ->orderBy('users.name')
             ->get(['supervisors.id', 'supervisors.nip', 'users.name']);
 
@@ -322,8 +324,18 @@ class WorkflowController extends Controller
         ]);
 
         $internshipRecord = DB::table('internships')
-            ->where('id', $internship)
-            ->first(['id', 'group_id', 'status']);
+            ->leftJoin('internship_groups', 'internship_groups.id', '=', 'internships.group_id')
+            ->join('students', 'students.id', '=', 'internships.student_id')
+            ->join('users as student_users', 'student_users.id', '=', 'students.user_id')
+            ->where('internships.id', $internship)
+            ->first([
+                'internships.id',
+                'internships.group_id',
+                'internships.status',
+                'internships.title',
+                'internship_groups.name as group_name',
+                'student_users.name as student_name',
+            ]);
 
         abort_if($internshipRecord === null, 404);
 
@@ -332,19 +344,42 @@ class WorkflowController extends Controller
             return back()->with('error', 'Pembimbing hanya dapat ditetapkan untuk KP yang disetujui atau sedang berjalan.');
         }
 
-        $internships = DB::table('internships')
-            ->whereIn('status', ['approved', 'in_progress']);
+        $supervisor = DB::table('supervisors')
+            ->join('users', 'users.id', '=', 'supervisors.user_id')
+            ->where('supervisors.id', $validated['supervisor_id'])
+            ->where('users.role', 'supervisor')
+            ->first(['users.id as user_id']);
 
-        if ($internshipRecord->group_id === null) {
-            $internships->where('id', $internshipRecord->id);
-        } else {
-            $internships->where('group_id', $internshipRecord->group_id);
-        }
+        abort_if($supervisor === null, 404);
 
-        $internships->update([
-            'supervisor_id' => $validated['supervisor_id'],
-            'updated_at' => now(),
-        ]);
+        $assignmentTarget = $internshipRecord->group_name
+            ? 'kelompok '.$internshipRecord->group_name
+            : 'mahasiswa '.$internshipRecord->student_name;
+        $internshipTitle = $internshipRecord->title ?: 'Kuliah Praktik';
+
+        DB::transaction(function () use ($internshipRecord, $validated, $supervisor, $assignmentTarget, $internshipTitle): void {
+            $internships = DB::table('internships')
+                ->whereIn('status', ['approved', 'in_progress']);
+
+            if ($internshipRecord->group_id === null) {
+                $internships->where('id', $internshipRecord->id);
+            } else {
+                $internships->where('group_id', $internshipRecord->group_id);
+            }
+
+            $internships->update([
+                'supervisor_id' => $validated['supervisor_id'],
+                'supervisor_name' => null,
+                'updated_at' => now(),
+            ]);
+
+            Notification::create([
+                'user_id' => $supervisor->user_id,
+                'title' => 'Penugasan Pembimbing KP',
+                'message' => "Admin telah menetapkan Anda sebagai dosen pembimbing untuk {$assignmentTarget} pada KP {$internshipTitle}. Buka menu Mahasiswa Bimbingan untuk melihat detailnya.",
+                'is_read' => false,
+            ]);
+        });
 
         return to_route('admin.groups.index')
             ->with('success', 'Dosen pembimbing berhasil ditetapkan.');

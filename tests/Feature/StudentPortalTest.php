@@ -53,6 +53,44 @@ class StudentPortalTest extends TestCase
             ->assertOk()
             ->assertSee('PT Solusi Digital Lampung')
             ->assertSee('Kuota Tersedia');
+
+        $this->get(route('mahasiswa.applications.create'))
+            ->assertOk()
+            ->assertSee('<datalist id="company-options">', false)
+            ->assertSee('value="PT Solusi Digital Lampung"', false);
+    }
+
+    public function test_newly_added_admin_company_appears_in_student_dashboard_preview(): void
+    {
+        $student = $this->createStudentUser();
+
+        for ($companyNumber = 1; $companyNumber <= 4; $companyNumber++) {
+            Company::create([
+                'name' => "Perusahaan Lama {$companyNumber}",
+                'address' => 'Jl. Contoh',
+                'city' => 'Bandar Lampung',
+            ]);
+        }
+
+        $admin = User::query()->create([
+            'name' => 'Admin Test',
+            'email' => 'admin_'.uniqid().'@simpul.test',
+            'password' => 'secret123',
+            'role' => 'admin',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.companies.store'), [
+                'name' => 'PT Perusahaan Terbaru',
+                'address' => 'Jl. Terbaru',
+                'city' => 'Metro',
+            ])
+            ->assertRedirect(route('admin.companies.index'));
+
+        $this->actingAs($student)
+            ->get(route('mahasiswa.dashboard'))
+            ->assertOk()
+            ->assertSee('PT Perusahaan Terbaru');
     }
 
     public function test_company_quota_shows_individual_count_and_blocks_excess(): void
@@ -106,6 +144,12 @@ class StudentPortalTest extends TestCase
     {
         $user = $this->createStudentUser('2417051034');
         $this->actingAs($user);
+        $admin = User::query()->create([
+            'name' => 'Admin Notifikasi',
+            'email' => 'admin-notifikasi@simpul.test',
+            'password' => 'secret123',
+            'role' => 'admin',
+        ]);
 
         $payload = [
             'type' => 'group',
@@ -137,6 +181,18 @@ class StudentPortalTest extends TestCase
         $response = $this->post(route('mahasiswa.applications.store'), $payload);
 
         $response->assertRedirect(route('mahasiswa.dashboard'));
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $admin->id,
+            'title' => 'Pengajuan Surat Pengantar KP Baru',
+            'is_read' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.notifications.index'))
+            ->assertOk()
+            ->assertSee('Pengajuan Surat Pengantar KP Baru')
+            ->assertSee('notification-read-all', false);
 
         $this->assertDatabaseHas('internship_groups', [
             'name' => 'Tim Garuda Unila',

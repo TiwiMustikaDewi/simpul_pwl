@@ -28,7 +28,10 @@ class CompanyController extends Controller
             });
         }
 
-        $companies = $query->orderBy('name')->get();
+        $companies = $query
+            ->orderByDesc('created_at')
+            ->orderBy('name')
+            ->get();
 
         // Apply status filter if requested
         if ($filterStatus === 'available') {

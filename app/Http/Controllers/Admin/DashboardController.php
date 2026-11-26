@@ -31,22 +31,6 @@ class DashboardController extends Controller
             ->map(fn ($total) => (int) $total)
             ->all();
 
-        // Pengajuan menunggu verifikasi (terbaru dulu)
-        $pending = DB::table('internships')
-            ->join('students', 'students.id', '=', 'internships.student_id')
-            ->join('users', 'users.id', '=', 'students.user_id')
-            ->join('companies', 'companies.id', '=', 'internships.company_id')
-            ->where('internships.status', 'pending')
-            ->orderByDesc('internships.created_at')
-            ->limit(5)
-            ->get([
-                'internships.id',
-                'internships.type',
-                'internships.created_at',
-                'users.name as student_name',
-                'companies.name as company_name',
-            ]);
-
         // Sidang yang masih aktif (diajukan / terjadwal)
         $sidang = DB::table('sidang_kps')
             ->join('internships', 'internships.id', '=', 'sidang_kps.internship_id')
@@ -83,7 +67,6 @@ class DashboardController extends Controller
             'period',
             'stats',
             'statusCounts',
-            'pending',
             'sidang',
             'experiences'
         ));

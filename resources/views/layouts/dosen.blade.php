@@ -204,6 +204,22 @@
         .dosen-header-profile:hover {
             background: var(--blue-light);
         }
+        .dosen-notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            border: 2px solid #fff;
+            border-radius: 20px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            line-height: 13px;
+            text-align: center;
+        }
     </style>
     @stack('styles')
 </head>
@@ -218,6 +234,7 @@
         ['Sidang & Penilaian',     'sidang',    'dosen.sidang.index', 'dosen.sidang.*'],
         ['Profil Dosen',           'profile',   'dosen.profile.index', 'dosen.profile.*'],
     ];
+    $unreadNotificationCount = auth()->user()->notifications()->where('is_read', false)->count();
 
     // Hitung inisial nama dosen untuk avatar profesional
     $cleanedName = preg_replace('/^(Dr\.|Prof\.|Ir\.|Drs\.|H\.|Hj\.|Ing\.)\s+/i', '', auth()->user()->name);
@@ -265,6 +282,15 @@
                     <path d="M9 11l3 3L22 4"></path>
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                 </svg>
+            </a>
+            <a href="{{ route('dosen.notifications.index') }}" class="header-icon{{ request()->routeIs('dosen.notifications.*') ? ' is-active' : '' }}" title="Pusat notifikasi" style="position: relative;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                    <path d="M10 21h4"></path>
+                </svg>
+                @if ($unreadNotificationCount > 0)
+                    <span class="dosen-notification-badge">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>
+                @endif
             </a>
             <a href="{{ route('dosen.profile.index') }}" class="header-icon" title="Profil dosen pembimbing">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

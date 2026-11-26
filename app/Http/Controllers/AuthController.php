@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Student;
+use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
@@ -38,7 +39,7 @@ class AuthController extends Controller
             'password' => $validated['password'],
         ];
 
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors([
                     'email' => 'Email atau password tidak sesuai.',
@@ -48,7 +49,6 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Memastikan role yang dipilih sesuai dengan akun.
         if ($user->role !== $validated['role']) {
             Auth::logout();
 
@@ -62,8 +62,7 @@ class AuthController extends Controller
                 ->withInput($request->only('email', 'role'));
         }
 
-        // Memastikan role akun dikenali.
-        if (!in_array($user->role, ['student', 'admin', 'supervisor'], true)) {
+        if (! in_array($user->role, ['student', 'admin', 'supervisor'], true)) {
             Auth::logout();
 
             $request->session()->invalidate();
@@ -147,7 +146,7 @@ class AuthController extends Controller
             ],
         ]);
 
-        // Registrasi mandiri hanya diperbolehkan untuk mahasiswa.
+        // Registrasi mandiri hanya untuk mahasiswa.
         if ($validated['role'] !== 'student') {
             return back()
                 ->withErrors([
@@ -162,7 +161,6 @@ class AuthController extends Controller
             // Membuat akun dan profil mahasiswa dalam satu transaksi.
             $user = DB::transaction(function () use ($validated) {
 
-                // Membuat akun pengguna.
                 $user = User::create([
                     'name' => $validated['name'],
                     'email' => $validated['email'],
@@ -170,7 +168,6 @@ class AuthController extends Controller
                     'role' => 'student',
                 ]);
 
-                // Membuat profil mahasiswa.
                 Student::create([
                     'user_id' => $user->id,
                     'npm' => $validated['npm'],
@@ -194,11 +191,14 @@ class AuthController extends Controller
                     'Registrasi mahasiswa berhasil. Selamat datang di SIMPUL!'
                 );
 
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
+
+            // Mencatat penyebab asli error database.
+            report($e);
 
             return back()
                 ->withErrors([
-                    'npm' => 'Registrasi gagal. NPM atau email mungkin sudah terdaftar.',
+                    'npm' => 'Registrasi gagal. Silakan periksa log aplikasi.',
                 ])
                 ->withInput(
                     $request->except('password', 'password_confirmation')
@@ -213,7 +213,7 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -221,14 +221,10 @@ class AuthController extends Controller
             'admin' => redirect()->route('admin.dashboard'),
             'supervisor' => redirect()->route('dosen.dashboard'),
             'student' => redirect()->route('mahasiswa.dashboard'),
-<<<<<<< HEAD
             default => abort(
                 403,
                 'Role akun tidak memiliki akses.'
             ),
-=======
-            default => abort(403, 'Role akun tidak memiliki akses.'),
->>>>>>> af4810d (Update registrasi)
         };
     }
 

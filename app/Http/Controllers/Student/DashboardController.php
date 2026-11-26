@@ -59,6 +59,8 @@ class DashboardController extends Controller
 
         // Available companies count & preview
         $companies = Company::with(['internships.group', 'internships.student.user'])
+            ->orderByDesc('created_at')
+            ->orderBy('name')
             ->limit(4)
             ->get();
 
