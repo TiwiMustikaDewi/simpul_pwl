@@ -117,6 +117,76 @@ class DosenWorkflowTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_dosen_can_manage_only_their_own_notifications(): void
+    {
+        [$dosen] = $this->createDosenUser();
+        $otherUser = User::create([
+            'name' => 'Dosen Lain',
+            'email' => 'dosen-lain@simpul.test',
+            'password' => 'password123',
+            'role' => 'supervisor',
+        ]);
+
+        $ownNotificationId = DB::table('notifications')->insertGetId([
+            'user_id' => $dosen->id,
+            'title' => 'Penugasan Pembimbing KP',
+            'message' => 'Admin menetapkan satu KP untuk Anda.',
+            'is_read' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $ownSecondNotificationId = DB::table('notifications')->insertGetId([
+            'user_id' => $dosen->id,
+            'title' => 'Notifikasi kedua',
+            'message' => 'Pemberitahuan untuk Anda.',
+            'is_read' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $otherNotificationId = DB::table('notifications')->insertGetId([
+            'user_id' => $otherUser->id,
+            'title' => 'Notifikasi milik dosen lain',
+            'message' => 'Informasi privat.',
+            'is_read' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $notificationRoute = route('dosen.notifications.index');
+
+        $this->actingAs($dosen)
+            ->get(route('dosen.notifications.index', ['filter' => 'unread']))
+            ->assertOk()
+            ->assertSee('Penugasan Pembimbing KP')
+            ->assertDontSee('Notifikasi milik dosen lain');
+
+        $this->from($notificationRoute)
+            ->patch(route('dosen.notifications.read', $ownNotificationId))
+            ->assertRedirect($notificationRoute);
+
+        $this->from($notificationRoute)
+            ->post(route('dosen.notifications.read-all'))
+            ->assertRedirect($notificationRoute);
+
+        $this->assertDatabaseHas('notifications', [
+            'id' => $ownNotificationId,
+            'is_read' => true,
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'id' => $ownSecondNotificationId,
+            'is_read' => true,
+        ]);
+
+        $this->from($notificationRoute)
+            ->delete(route('dosen.notifications.destroy', $otherNotificationId))
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('notifications', [
+            'id' => $otherNotificationId,
+            'is_read' => false,
+        ]);
+    }
+
     public function test_general_dashboard_redirects_supervisor_to_dosen_dashboard(): void
     {
         [$dosen] = $this->createDosenUser();

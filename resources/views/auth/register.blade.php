@@ -5,30 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrasi | SIMPUL</title>
 
-<<<<<<< HEAD
-    <!-- Poppins Font -->
+    <!-- Google Font: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --navy:    #003B5C;
-            --ocean:   #005C8A;
-            --primary: #0095D9;
-            --cyan:    #38BDF8;
-            --teal:    #06B6D4;
-            --fog:     #DCF1FB;
-            --bg:      #F0F7FD;
-            --white:   #FFFFFF;
-            --text:    #09111E;
-            --body:    #162238;
-            --muted:   #2B3D56;
-            --border:  #C8E1F5;
-=======
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -46,7 +26,6 @@
             --border: #C8E1F5;
             --blue: #2563EB;
             --blue-dark: #003B5C;
->>>>>>> af4810d (Update registrasi)
         }
 
         * {
@@ -59,11 +38,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-<<<<<<< HEAD
             font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-=======
-            font-family: 'Poppins', sans-serif;
->>>>>>> af4810d (Update registrasi)
             color: var(--body);
             background:
                 radial-gradient(ellipse 70% 50% at 10% 15%, rgba(0, 149, 217, 0.14) 0%, transparent 60%),

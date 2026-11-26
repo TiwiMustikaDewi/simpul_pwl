@@ -62,7 +62,7 @@
                 </div>
             </section>
 
-            <!-- STATISTIK -->
+            <!-- STATISTIK RINGKASAN -->
             <section>
                 <div class="section-heading">
                     <div>
@@ -122,6 +122,74 @@
                         <div class="stat-label">Sidang Terjadwal</div>
                         <div class="stat-hint">Siap dinilai &amp; dievaluasi</div>
                     </a>
+                </div>
+            </section>
+
+            <!-- MAHASISWA BIMBINGAN TERBARU -->
+            <section>
+                <div class="section-heading">
+                    <div>
+                        <h2>Mahasiswa Bimbingan Terbaru</h2>
+                        <p>Daftar mahasiswa KP yang terakhir diperbarui atau ditetapkan kepada Anda.</p>
+                    </div>
+                    <a href="{{ route('dosen.students.index') }}" class="text-link">Lihat Semua ({{ $stats['total_students'] }}) →</a>
+                </div>
+
+                <div class="panel workflow-panel">
+                    <div class="workflow-table-wrap">
+                        <table class="workflow-table">
+                            <thead>
+                                <tr>
+                                    <th>Mahasiswa</th>
+                                    <th>Tempat &amp; Judul KP</th>
+                                    <th>Periode</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($recentStudents as $student)
+                                    <tr class="searchable-card">
+                                        <td data-label="Mahasiswa">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <div class="mini-avatar">
+                                                    {{ strtoupper(mb_substr($student->student_name, 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <strong>{{ $student->student_name }}</strong>
+                                                    <small>{{ $student->npm }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Tempat &amp; Judul KP">
+                                            <strong>{{ $student->company_name }}</strong>
+                                            <small style="color: var(--blue-dark); font-style: italic;">"{{ $student->title }}"</small>
+                                        </td>
+                                        <td data-label="Periode">
+                                            {{ \Carbon\Carbon::parse($student->start_date)->locale('id')->translatedFormat('d M Y') }}<br>
+                                            <small>s/d {{ \Carbon\Carbon::parse($student->end_date)->locale('id')->translatedFormat('d M Y') }}</small>
+                                        </td>
+                                        <td data-label="Status">
+                                            <span class="status-pill {{ $student->status }}">
+                                                {{ ['in_progress' => 'Sedang berjalan', 'approved' => 'Disetujui', 'completed' => 'Selesai', 'pending' => 'Pending', 'rejected' => 'Ditolak'][$student->status] ?? $student->status }}
+                                            </span>
+                                        </td>
+                                        <td data-label="Aksi">
+                                            <a href="{{ route('dosen.students.show', $student->id) }}" class="btn btn-outline btn-sm">
+                                                Detail →
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="table-empty">
+                                            Belum ada mahasiswa bimbingan yang terdaftar.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -205,7 +273,7 @@
                                 <polyline points="14 2 14 8 20 8"></polyline>
                                 <line x1="16" y1="13" x2="8" y2="13"></line>
                                 <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <line x1="10" y1="9" x2="8" y2="9"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
                             </svg>
                         </div>
                         <h3>Laporan Akhir KP</h3>
@@ -328,6 +396,22 @@
                         Sidang mahasiswa bimbingan yang dijadwalkan admin akan tampil di sini.
                     </div>
                 @endforelse
+            </section>
+
+            <!-- PANDUAN CEPAT DOSEN -->
+            <section class="panel" style="background: linear-gradient(145deg, #f8fbff, #eef5ff); border-color: #d4e5f9;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="font-size: 18px;">💡</span>
+                    <strong style="color: var(--blue-dark); font-size: 12px;">Tips Pembimbingan KP</strong>
+                </div>
+                <p style="color: #556c8c; font-size: 11px; line-height: 1.7;">
+                    Pastikan mahasiswa mengisi logbook secara berkala setiap minggu. Berkas laporan akhir sebaiknya disetujui minimal 3 hari sebelum pelaksanaan sidang KP.
+                </p>
+                <div style="margin-top: 12px;">
+                    <a href="{{ route('dosen.logs.index') }}" class="btn btn-outline btn-full btn-sm" style="background: #fff;">
+                        Cek Logbook Terbaru →
+                    </a>
+                </div>
             </section>
 
         </aside>

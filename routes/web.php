@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\WorkflowController as AdminWorkflowController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dosen\BimbinganController as DosenBimbinganController;
 use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
 use App\Http\Controllers\Dosen\LogbookController as DosenLogbookController;
+use App\Http\Controllers\Dosen\NotificationController as DosenNotificationController;
 use App\Http\Controllers\Dosen\ProfileController as DosenProfileController;
 use App\Http\Controllers\Dosen\ReportController as DosenReportController;
 use App\Http\Controllers\Dosen\SidangController as DosenSidangController;
@@ -63,6 +65,17 @@ Route::middleware(['auth', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
+
+        Route::get('/notifikasi', [AdminNotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::patch('/notifikasi/{notification}/baca', [AdminNotificationController::class, 'markAsRead'])
+            ->whereNumber('notification')
+            ->name('notifications.read');
+        Route::post('/notifikasi/baca-semua', [AdminNotificationController::class, 'markAllAsRead'])
+            ->name('notifications.read-all');
+        Route::delete('/notifikasi/{notification}', [AdminNotificationController::class, 'destroy'])
+            ->whereNumber('notification')
+            ->name('notifications.destroy');
 
         Route::get('/pengguna', [AdminWorkflowController::class, 'people'])
             ->name('pengguna.index');
@@ -165,6 +178,16 @@ Route::middleware(['auth', 'role:supervisor'])
     ->group(function () {
         Route::get('/dashboard', [DosenDashboardController::class, 'index'])
             ->name('dashboard');
+        Route::get('/notifikasi', [DosenNotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::patch('/notifikasi/{notification}/baca', [DosenNotificationController::class, 'markAsRead'])
+            ->whereNumber('notification')
+            ->name('notifications.read');
+        Route::post('/notifikasi/baca-semua', [DosenNotificationController::class, 'markAllAsRead'])
+            ->name('notifications.read-all');
+        Route::delete('/notifikasi/{notification}', [DosenNotificationController::class, 'destroy'])
+            ->whereNumber('notification')
+            ->name('notifications.destroy');
 
         // Mahasiswa Bimbingan
         Route::get('/bimbingan', [DosenBimbinganController::class, 'index'])

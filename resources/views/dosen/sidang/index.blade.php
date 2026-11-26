@@ -31,6 +31,30 @@
         </div>
     @endif
 
+    <!-- RINGKASAN METRIK SIDANG -->
+    <div class="stat-grid" style="margin-bottom: 20px;">
+        <div class="stat-card blue">
+            <div class="stat-number">{{ number_format($counts['all']) }}</div>
+            <div class="stat-label">Total Sidang KP</div>
+            <div class="stat-hint">Pengajuan &amp; terjadwal</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-number">{{ number_format($counts['scheduled']) }}</div>
+            <div class="stat-label">Terjadwal</div>
+            <div class="stat-hint">Siap diuji &amp; dievaluasi</div>
+        </div>
+        <div class="stat-card yellow">
+            <div class="stat-number">{{ number_format($counts['submitted']) }}</div>
+            <div class="stat-label">Menunggu Jadwal</div>
+            <div class="stat-hint">Menunggu penentuan admin</div>
+        </div>
+        <div class="stat-card green" style="background: #eafaf3; border-color: #bcebd7;">
+            <div class="stat-number" style="color: var(--green);">{{ number_format($counts['completed']) }}</div>
+            <div class="stat-label">Selesai Dinilai</div>
+            <div class="stat-hint">Nilai akhir telah tersimpan</div>
+        </div>
+    </div>
+
     <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="filter-group">
@@ -65,27 +89,44 @@
         </form>
     </div>
 
+    <!-- PANDUAN STANDAR RUBRIK PENILAIAN -->
+    <div class="rubric-box">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 16px;">📋</span>
+            <strong style="color: var(--blue-dark); font-size: 12px;">Pedoman Penilaian Sidang Kuliah Praktik:</strong>
+        </div>
+        <p style="font-size: 11px; color: #536783; line-height: 1.7;">
+            Rentang Predikat Nilai: <strong>A</strong> (&ge; 80) · <strong>A-</strong> (76–79) · <strong>B+</strong> (71–75) · <strong>B</strong> (66–70) · <strong>B-</strong> (61–65) · <strong>C</strong> (55–60).
+            Penilaian mencakup penguasaan materi laporan, presentasi, sikap/etika, dan capaian target kerja praktik.
+        </p>
+    </div>
+
     <!-- DAFTAR SIDANG -->
     <section class="workflow-list">
         @forelse ($sidangList as $item)
             <article class="panel workflow-panel searchable-card">
                 <div class="workflow-card-heading">
-                    <div>
-                        <h2>{{ $item->student_name }} · {{ $item->npm }}</h2>
-                        <p style="color: var(--blue-dark); font-weight: 700; margin-top: 3px;">
-                            "{{ $item->internship_title }}"
-                        </p>
-                        <small style="color: var(--muted);">
-                            {{ $item->major }} · Instansi: {{ $item->company_name }}
-                            ({{ $item->internship_type === 'group' ? 'Kelompok' : 'Individu' }})
-                        </small>
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <div class="mini-avatar">
+                            {{ strtoupper(mb_substr($item->student_name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h2>{{ $item->student_name }} · <span style="color: var(--muted); font-size: 12px;">{{ $item->npm }}</span></h2>
+                            <p style="color: var(--blue-dark); font-weight: 700; margin-top: 3px;">
+                                "{{ $item->internship_title }}"
+                            </p>
+                            <small style="color: var(--muted); display: block; margin-top: 2px;">
+                                {{ $item->major }} · Instansi: {{ $item->company_name }}
+                                ({{ $item->internship_type === 'group' ? 'Kelompok' : 'Individu' }})
+                            </small>
+                        </div>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
                         @if ($item->grade)
-                            <span class="status-pill completed" style="font-size: 11px;">
-                                Nilai: {{ $item->grade }}
-                            </span>
+                            <div class="grade-ribbon-lg" style="min-width: 45px; height: 45px; font-size: 18px;" title="Nilai Sidang">
+                                {{ $item->grade }}
+                            </div>
                         @endif
                         <span class="status-pill {{ $item->status }}">
                             {{ ['scheduled' => 'Terjadwal', 'submitted' => 'Menunggu Jadwal', 'completed' => 'Selesai', 'rejected' => 'Ditolak'][$item->status] ?? $item->status }}
@@ -98,25 +139,27 @@
                         <span class="label">Waktu Pelaksanaan</span>
                         <span class="val">
                             @if ($item->sidang_date)
-                                {{ \Carbon\Carbon::parse($item->sidang_date)->locale('id')->translatedFormat('l, d F Y - H:i') }} WIB
+                                📅 {{ \Carbon\Carbon::parse($item->sidang_date)->locale('id')->translatedFormat('l, d F Y - H:i') }} WIB
                             @else
-                                Belum dijadwalkan oleh admin
+                                <span style="color: var(--muted); font-style: italic;">Belum dijadwalkan oleh admin</span>
                             @endif
                         </span>
                     </div>
 
                     <div class="detail-item">
                         <span class="label">Ruang Sidang</span>
-                        <span class="val">{{ $item->room ?? 'Belum ditentukan' }}</span>
+                        <span class="val">
+                            🏛️ {{ $item->room ?? 'Belum ditentukan' }}
+                        </span>
                     </div>
 
                     <div class="detail-item">
                         <span class="label">Status Evaluasi</span>
                         <span class="val">
                             @if ($item->grade)
-                                Sudah dinilai ({{ $item->grade }})
+                                <strong style="color: var(--green);">Sudah dinilai ({{ $item->grade }})</strong>
                             @else
-                                <span style="color: var(--yellow);">Menunggu penilaian</span>
+                                <span style="color: #b25e00; font-weight: 700;">⚡ Menunggu penilaian</span>
                             @endif
                         </span>
                     </div>
@@ -124,7 +167,7 @@
 
                 @if ($item->notes)
                     <div class="review-note">
-                        <strong>Catatan Evaluasi / Catatan Sidang:</strong> {{ $item->notes }}
+                        <strong>Catatan Evaluasi / Berita Acara Sidang:</strong> {{ $item->notes }}
                     </div>
                 @endif
 
@@ -136,7 +179,7 @@
                     </div>
 
                     <label class="form-field">
-                        <span>Nilai Akhir Sidang</span>
+                        <span>Nilai Akhir Sidang (Huruf atau Angka)</span>
                         <input
                             type="text"
                             name="grade"
@@ -150,12 +193,12 @@
                     </label>
 
                     <label class="form-field form-field-wide">
-                        <span>Catatan / Berita Acara Sidang</span>
+                        <span>Catatan Evaluasi / Berita Acara Sidang</span>
                         <textarea
                             name="notes"
                             rows="2"
                             class="form-control"
-                            placeholder="Tuliskan catatan evaluasi, revisi kecil jika ada, atau masukan sidang..."
+                            placeholder="Tuliskan catatan evaluasi penguasaan materi, tanya jawab, atau masukan sidang..."
                         >{{ old('notes', $item->notes) }}</textarea>
                     </label>
 
@@ -168,6 +211,7 @@
             </article>
         @empty
             <div class="panel empty-state">
+                <div style="font-size: 24px; margin-bottom: 6px;">🎓</div>
                 <strong>Tidak ada data sidang KP</strong>
                 Belum ada pengajuan atau jadwal sidang yang sesuai dengan filter.
             </div>

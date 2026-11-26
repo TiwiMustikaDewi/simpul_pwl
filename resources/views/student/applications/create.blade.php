@@ -706,15 +706,21 @@
                         type="text"
                         name="company_name"
                         id="company_name"
+                        list="company-options"
                         required
                         autocomplete="off"
                         value="{{ old('company_name', $selectedCompanyName) }}"
                         placeholder="Tuliskan nama instansi, cth: Dinas Komunikasi dan Informatika Provinsi Lampung"
                         style="width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13.5px; background: #ffffff;"
                     >
+                    <datalist id="company-options">
+                        @foreach ($existingCompanies as $existingCompany)
+                            <option value="{{ $existingCompany->name }}" label="{{ $existingCompany->city }}"></option>
+                        @endforeach
+                    </datalist>
                     <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 5px;">
                         <iconify-icon icon="lucide:info" width="14" height="14" style="color: #3b82f6; flex-shrink: 0;"></iconify-icon>
-                        <span>Tuliskan nama instansi tujuan Anda secara mandiri. Instansi akan otomatis tercatat ke dalam sistem.</span>
+                        <span>Pilih saran perusahaan yang sudah terdaftar, atau tuliskan nama instansi baru.</span>
                     </div>
                 </div>
 

@@ -31,6 +31,30 @@
         </div>
     @endif
 
+    <!-- RINGKASAN METRIK LAPORAN -->
+    <div class="stat-grid" style="margin-bottom: 20px;">
+        <div class="stat-card blue">
+            <div class="stat-number">{{ number_format($counts['all']) }}</div>
+            <div class="stat-label">Total Laporan</div>
+            <div class="stat-hint">Berkas yang diunggah</div>
+        </div>
+        <div class="stat-card yellow">
+            <div class="stat-number">{{ number_format($counts['submitted']) }}</div>
+            <div class="stat-label">Menunggu Review</div>
+            <div class="stat-hint">Perlu evaluasi dosen</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-number">{{ number_format($counts['approved']) }}</div>
+            <div class="stat-label">Disetujui</div>
+            <div class="stat-hint">Laporan siap untuk sidang</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-number">{{ number_format($counts['revision']) }}</div>
+            <div class="stat-label">Perlu Revisi</div>
+            <div class="stat-hint">Memerlukan perbaikan</div>
+        </div>
+    </div>
+
     <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="filter-group">
@@ -70,37 +94,50 @@
         @forelse ($reports as $report)
             <article class="panel workflow-panel searchable-card">
                 <div class="workflow-card-heading">
-                    <div>
-                        <h2>{{ $report->title }}</h2>
-                        <p style="font-weight: 700; color: var(--blue-dark); margin-top: 4px;">
-                            {{ $report->student_name }} · {{ $report->npm }}
-                        </p>
-                        <small style="color: var(--muted);">
-                            Tempat KP: {{ $report->company_name }} · "{{ $report->internship_title }}"
-                            · Diunggah: {{ \Carbon\Carbon::parse($report->created_at)->locale('id')->translatedFormat('d F Y, H:i') }}
-                        </small>
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <div class="mini-avatar">
+                            {{ strtoupper(mb_substr($report->student_name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h2>{{ $report->title }}</h2>
+                            <p style="font-weight: 700; color: var(--blue-dark); margin-top: 3px;">
+                                {{ $report->student_name }} · <span style="color: var(--muted); font-size: 11px;">{{ $report->npm }}</span>
+                            </p>
+                            <small style="color: var(--muted); display: block; margin-top: 2px;">
+                                Tempat KP: {{ $report->company_name }} · "{{ $report->internship_title }}"
+                                · Diunggah: {{ \Carbon\Carbon::parse($report->created_at)->locale('id')->translatedFormat('d F Y, H:i') }}
+                            </small>
+                        </div>
                     </div>
                     <span class="status-pill {{ $report->status }}">
                         {{ ['submitted' => 'Menunggu review', 'approved' => 'Disetujui', 'revision' => 'Perlu revisi'][$report->status] ?? $report->status }}
                     </span>
                 </div>
 
-                <div style="margin: 14px 0 10px;">
+                <!-- Kartu Unduhan Berkas -->
+                <div class="doc-file-card">
+                    <div class="doc-file-meta">
+                        <div class="doc-file-icon">PDF</div>
+                        <div>
+                            <strong style="color: var(--blue-dark); font-size: 12px; display: block;">{{ $report->title }}</strong>
+                            <small style="color: var(--muted); font-size: 10px;">Berkas Laporan Akhir Mahasiswa</small>
+                        </div>
+                    </div>
                     <a href="{{ route('dosen.reports.download', $report->id) }}" class="btn btn-outline btn-sm">
-                        Unduh Berkas Laporan
+                        Unduh Berkas Laporan 📥
                     </a>
                 </div>
 
                 @if ($report->feedback)
                     <div class="review-note">
-                        <strong>Catatan Evaluasi / Feedback:</strong> {{ $report->feedback }}
+                        <strong>Catatan Evaluasi / Feedback Dosen:</strong> {{ $report->feedback }}
                     </div>
                 @endif
 
                 <form action="{{ route('dosen.reports.review', $report->id) }}" method="POST" class="workflow-form form-grid" style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);">
                     @csrf
                     <label class="form-field">
-                        <span>Status Persetujuan</span>
+                        <span>Status Persetujuan Laporan</span>
                         <select name="status" class="form-control" required>
                             <option value="approved" {{ $report->status === 'approved' ? 'selected' : '' }}>✓ Setujui Laporan</option>
                             <option value="revision" {{ $report->status === 'revision' ? 'selected' : '' }}>⚠ Minta Revisi Laporan</option>
@@ -109,7 +146,7 @@
 
                     <label class="form-field form-field-wide">
                         <span>Catatan Masukan / Uraian Revisi Laporan</span>
-                        <textarea name="feedback" rows="3" class="form-control" placeholder="Tuliskan catatan evaluasi isi, format, atau revisi laporan...">{{ old('feedback', $report->feedback) }}</textarea>
+                        <textarea name="feedback" rows="3" class="form-control" placeholder="Tuliskan catatan evaluasi isi, format penulisan, atau bab yang perlu diperbaiki...">{{ old('feedback', $report->feedback) }}</textarea>
                     </label>
 
                     <div class="form-field-wide form-actions">
@@ -119,6 +156,7 @@
             </article>
         @empty
             <div class="panel empty-state">
+                <div style="font-size: 24px; margin-bottom: 6px;">📄</div>
                 <strong>Tidak ada laporan akhir</strong>
                 Belum ada laporan yang sesuai dengan filter atau mahasiswa bimbingan belum mengunggah laporan.
             </div>
