@@ -3,12 +3,20 @@
 @section('title', $title)
 
 @section('content')
-    <div class="page-top">
-        <div>
-            <h1>{{ $title }}</h1>
-            <p>{{ $description }}</p>
+    <div class="workflow-page-header">
+        <a
+            href="{{ route('admin.dashboard') }}"
+            class="workflow-back-button"
+            aria-label="Kembali ke Dashboard"
+        >
+            <iconify-icon icon="lucide:chevron-left" width="24" height="24" aria-hidden="true"></iconify-icon>
+        </a>
+        <div class="page-top">
+            <div>
+                <h1>{{ $title }}</h1>
+                <p>{{ $description }}</p>
+            </div>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline">← Dashboard</a>
     </div>
 
     @if (session('success'))

@@ -50,6 +50,20 @@ class AdminWorkflowTest extends TestCase
             ->assertDontSee('SIMPUL / Admin / Data Perusahaan');
     }
 
+    public function test_admin_workflow_pages_show_an_icon_only_back_button_above_the_title(): void
+    {
+        $this->actingAs($this->createUser('admin'))
+            ->get(route('admin.applications.index'))
+            ->assertOk()
+            ->assertSee('<div class="workflow-page-header">', false)
+            ->assertSee('href="'.route('admin.dashboard').'"', false)
+            ->assertSee('class="workflow-back-button"', false)
+            ->assertSee('aria-label="Kembali ke Dashboard"', false)
+            ->assertSee('<iconify-icon icon="lucide:chevron-left" width="24" height="24" aria-hidden="true"></iconify-icon>', false)
+            ->assertDontSee('← Dashboard')
+            ->assertSee('<h1>Verifikasi Pengajuan</h1>', false);
+    }
+
     public function test_admin_header_matches_student_brand_and_profile_layout(): void
     {
         $admin = $this->createUser('admin');
@@ -58,6 +72,10 @@ class AdminWorkflowTest extends TestCase
             ->get(route('admin.dashboard'))
             ->assertOk()
             ->assertSee('Portal Admin · Universitas Lampung')
+            ->assertSee('id="adminSidebarToggle"', false)
+            ->assertSee('aria-label="Buka Menu Navigasi"', false)
+            ->assertSee('id="adminSidebar"', false)
+            ->assertSee('id="adminSidebarBackdrop"', false)
             ->assertSee('href="'.route('admin.notifications.index').'"', false)
             ->assertSee('<iconify-icon icon="lucide:bell" width="20" height="20" aria-hidden="true"></iconify-icon>', false)
             ->assertSee('<div class="header-avatar">'.strtoupper(substr($admin->name, 0, 1)).'</div>', false)
@@ -211,13 +229,30 @@ class AdminWorkflowTest extends TestCase
             ->assertSee('Menunggu Verifikasi');
     }
 
-    public function test_admin_welcome_banner_does_not_render_the_review_button(): void
+    public function test_admin_service_cards_render_in_a_horizontal_scroller_with_next_button(): void
     {
         $this->actingAs($this->createUser('admin'))
             ->get(route('admin.dashboard'))
             ->assertOk()
+            ->assertSee('<section class="service-section">', false)
+            ->assertSee('id="adminServiceTrack"', false)
+            ->assertSee('aria-label="Lihat layanan berikutnya"', false)
+            ->assertSee('aria-label="Lihat layanan sebelumnya"', false)
+            ->assertSee('class="service-scroll-button service-scroll-back-button"', false)
+            ->assertSee('aria-controls="adminServiceTrack"', false)
+            ->assertDontSee('<span class="service-arrow">', false)
+            ->assertSee('Kelola Layanan');
+    }
+
+    public function test_admin_welcome_banner_does_not_render_the_review_button(): void
+    {
+        $admin = $this->createUser('admin');
+
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
             ->assertSee('<section class="welcome-banner">', false)
-            ->assertSee('Selamat datang,')
+            ->assertSee('Selamat datang <span>'.$admin->name.'!</span>', false)
             ->assertDontSee('Tinjau Pengajuan');
     }
 
