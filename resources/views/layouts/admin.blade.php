@@ -45,13 +45,25 @@
 
     <!-- HEADER -->
     <header class="topbar">
-        <a href="{{ route('admin.dashboard') }}" class="brand">
-            <div class="brand-icon">S</div>
-            <div>
-                <div class="brand-name">SIMPUL</div>
-                <div class="brand-subtitle">Portal Admin · Universitas Lampung</div>
-            </div>
-        </a>
+        <div class="topbar-brand">
+            <button
+                type="button"
+                class="admin-sidebar-toggle"
+                id="adminSidebarToggle"
+                aria-label="Buka Menu Navigasi"
+                aria-controls="adminSidebar"
+                aria-expanded="false"
+            >
+                <iconify-icon icon="lucide:menu" width="22" height="22" aria-hidden="true"></iconify-icon>
+            </button>
+            <a href="{{ route('admin.dashboard') }}" class="brand">
+                <div class="brand-icon">S</div>
+                <div>
+                    <div class="brand-name">SIMPUL</div>
+                    <div class="brand-subtitle">Portal Admin · Universitas Lampung</div>
+                </div>
+            </a>
+        </div>
 
         <div class="header-actions">
             <a
@@ -81,7 +93,20 @@
     <div class="layout">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar">
+        <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+        <aside class="sidebar" id="adminSidebar" aria-label="Navigasi admin">
+            <div class="sidebar-mobile-header">
+                <div class="sidebar-mobile-brand">
+                    <div class="brand-icon">S</div>
+                    <div>
+                        <div class="brand-name">SIMPUL</div>
+                        <div class="brand-subtitle">Portal Admin</div>
+                    </div>
+                </div>
+                <button type="button" class="sidebar-close-btn" id="adminSidebarClose" aria-label="Tutup Menu Navigasi">
+                    <iconify-icon icon="lucide:x" width="20" height="20" aria-hidden="true"></iconify-icon>
+                </button>
+            </div>
             <div class="nav-label">MENU UTAMA</div>
 
             @foreach ($menu as [$label, $icon, $routeName, $pattern])
@@ -165,6 +190,104 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const adminSidebar = document.getElementById('adminSidebar');
+        const adminSidebarToggle = document.getElementById('adminSidebarToggle');
+        const adminSidebarClose = document.getElementById('adminSidebarClose');
+        const adminSidebarBackdrop = document.getElementById('adminSidebarBackdrop');
+
+        function closeAdminSidebar() {
+            if (!adminSidebar || !adminSidebarToggle) {
+                return;
+            }
+
+            adminSidebar.classList.remove('is-open');
+            adminSidebarBackdrop.classList.remove('is-active');
+            document.body.classList.remove('admin-sidebar-open');
+            adminSidebarToggle.setAttribute('aria-expanded', 'false');
+            adminSidebarToggle.setAttribute('aria-label', 'Buka Menu Navigasi');
+            adminSidebarToggle.focus();
+        }
+
+        if (adminSidebar && adminSidebarToggle && adminSidebarClose && adminSidebarBackdrop) {
+            adminSidebarToggle.addEventListener('click', function () {
+                const isOpen = adminSidebar.classList.toggle('is-open');
+
+                adminSidebarBackdrop.classList.toggle('is-active', isOpen);
+                document.body.classList.toggle('admin-sidebar-open', isOpen);
+                adminSidebarToggle.setAttribute('aria-expanded', String(isOpen));
+                adminSidebarToggle.setAttribute('aria-label', isOpen ? 'Tutup Menu Navigasi' : 'Buka Menu Navigasi');
+            });
+
+            adminSidebarClose.addEventListener('click', closeAdminSidebar);
+            adminSidebarBackdrop.addEventListener('click', closeAdminSidebar);
+
+            adminSidebar.querySelectorAll('.nav-link').forEach(function (link) {
+                link.addEventListener('click', closeAdminSidebar);
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && adminSidebar.classList.contains('is-open')) {
+                    closeAdminSidebar();
+                }
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 900 && adminSidebar.classList.contains('is-open')) {
+                    closeAdminSidebar();
+                }
+            });
+        }
+
+        const serviceTrack = document.getElementById('adminServiceTrack');
+        const scrollServicesButton = document.getElementById('scrollAdminServices');
+        const scrollServicesBackButton = document.getElementById('scrollAdminServicesBack');
+
+        if (serviceTrack && scrollServicesButton && scrollServicesBackButton) {
+            function getServiceScrollDistance() {
+                const firstCard = serviceTrack.querySelector('.service-card');
+                const gap = parseFloat(getComputedStyle(serviceTrack).gap) || 0;
+
+                return firstCard
+                    ? firstCard.getBoundingClientRect().width + gap
+                    : serviceTrack.clientWidth;
+            }
+
+            function updateServiceScrollButtons() {
+                const hasScrolled = serviceTrack.scrollLeft > 1;
+                const backButtonWasHidden = scrollServicesBackButton.hidden;
+                const firstCard = serviceTrack.querySelector('.service-card');
+                const visibleCardCount = firstCard
+                    ? serviceTrack.clientWidth / firstCard.getBoundingClientRect().width
+                    : 0;
+
+                scrollServicesBackButton.hidden = !hasScrolled;
+
+                if (hasScrolled && backButtonWasHidden && visibleCardCount >= 2.7) {
+                    serviceTrack.scrollTo({
+                        left: serviceTrack.scrollWidth - serviceTrack.clientWidth,
+                        behavior: 'smooth',
+                    });
+                }
+
+                const maxScrollLeft = serviceTrack.scrollWidth - serviceTrack.clientWidth;
+
+                scrollServicesButton.disabled = maxScrollLeft <= 1 || serviceTrack.scrollLeft >= maxScrollLeft - 1;
+                scrollServicesBackButton.disabled = !hasScrolled;
+            }
+
+            scrollServicesButton.addEventListener('click', function () {
+                serviceTrack.scrollBy({ left: getServiceScrollDistance(), behavior: 'smooth' });
+            });
+
+            scrollServicesBackButton.addEventListener('click', function () {
+                serviceTrack.scrollBy({ left: -getServiceScrollDistance(), behavior: 'smooth' });
+            });
+
+            serviceTrack.addEventListener('scroll', updateServiceScrollButtons, { passive: true });
+            window.addEventListener('resize', updateServiceScrollButtons);
+            updateServiceScrollButtons();
+        }
+
         const logoutTriggerForm = document.getElementById('logoutTriggerForm');
         const logoutModal = document.getElementById('adminLogoutModal');
         const cancelLogoutButton = document.getElementById('cancelAdminLogout');

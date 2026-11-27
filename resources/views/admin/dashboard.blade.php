@@ -25,8 +25,7 @@
                 <div class="eyebrow">ADMIN JURUSAN · UNIVERSITAS LAMPUNG</div>
 
                 <h2>
-                    Selamat datang,<br>
-                    <span>{{ auth()->user()->name }}!</span>
+                    Selamat datang <span>{{ auth()->user()->name }}!</span>
                 </h2>
 
                 <p class="welcome-text">
@@ -77,45 +76,6 @@
                 </div>
             </section>
 
-            <!-- KELOLA LAYANAN -->
-            <section>
-                <div class="section-heading">
-                    <div>
-                        <h2>Kelola Layanan</h2>
-                        <p>Pilih layanan yang ingin kamu kelola.</p>
-                    </div>
-                </div>
-
-                <div class="service-grid">
-                    <a href="{{ route('admin.applications.index') }}" class="service-card blue searchable-card">
-                        <div class="service-icon"><iconify-icon icon="carbon:receipt-verification" width="24" height="24" aria-hidden="true"></iconify-icon></div>
-                        <h3>Verifikasi Pengajuan</h3>
-                        <p>Periksa dokumen, beri catatan perbaikan, dan setujui pengajuan KP.</p>
-                        <span class="service-arrow">→</span>
-                    </a>
-
-                    <a href="{{ route('admin.companies.index') }}" class="service-card red searchable-card">
-                        <div class="service-icon"><iconify-icon icon="uix-sharp:company-group" width="24" height="24" aria-hidden="true"></iconify-icon></div>
-                        <h3>Data Perusahaan</h3>
-                        <p>Kelola data perusahaan atau instansi tempat KP beserta kuota periode.</p>
-                        <span class="service-arrow">→</span>
-                    </a>
-
-                    <a href="{{ route('admin.groups.index') }}" class="service-card green searchable-card">
-                        <div class="service-icon"><iconify-icon icon="uix-sharp:users-three" width="24" height="24" aria-hidden="true"></iconify-icon></div>
-                        <h3>Kelompok &amp; Pembimbing</h3>
-                        <p>Atur kelompok KP dan tetapkan dosen pembimbing.</p>
-                        <span class="service-arrow">→</span>
-                    </a>
-
-                    <a href="{{ route('admin.sidang.index') }}" class="service-card yellow searchable-card">
-                        <div class="service-icon"><iconify-icon icon="lucide:calendar-clock" width="24" height="24" aria-hidden="true"></iconify-icon></div>
-                        <h3>Sidang KP</h3>
-                        <p>Kelola pengajuan sidang dan atur jadwal pelaksanaan.</p>
-                        <span class="service-arrow">→</span>
-                    </a>
-                </div>
-            </section>
         </div>
 
         <!-- KOLOM KANAN -->
@@ -181,6 +141,61 @@
             </section>
 
         </aside>
+
+        <section class="service-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Kelola Layanan</h2>
+                    <p>Pilih layanan yang ingin kamu kelola.</p>
+                </div>
+            </div>
+
+            <div class="service-carousel">
+                <button
+                    type="button"
+                    class="service-scroll-button service-scroll-back-button"
+                    id="scrollAdminServicesBack"
+                    aria-label="Lihat layanan sebelumnya"
+                    aria-controls="adminServiceTrack"
+                    hidden
+                    disabled
+                >&lt;</button>
+
+                <div class="service-grid" id="adminServiceTrack" tabindex="0" aria-label="Daftar layanan admin">
+                    <a href="{{ route('admin.applications.index') }}" class="service-card blue searchable-card">
+                        <div class="service-icon"><iconify-icon icon="carbon:receipt-verification" width="24" height="24" aria-hidden="true"></iconify-icon></div>
+                        <h3>Verifikasi Pengajuan</h3>
+                        <p>Periksa dokumen, beri catatan perbaikan, dan setujui pengajuan KP.</p>
+                    </a>
+
+                    <a href="{{ route('admin.companies.index') }}" class="service-card red searchable-card">
+                        <div class="service-icon"><iconify-icon icon="uix-sharp:company-group" width="24" height="24" aria-hidden="true"></iconify-icon></div>
+                        <h3>Data Perusahaan</h3>
+                        <p>Kelola data perusahaan atau instansi tempat KP beserta kuota periode.</p>
+                    </a>
+
+                    <a href="{{ route('admin.groups.index') }}" class="service-card green searchable-card">
+                        <div class="service-icon"><iconify-icon icon="uix-sharp:users-three" width="24" height="24" aria-hidden="true"></iconify-icon></div>
+                        <h3>Kelompok &amp; Pembimbing</h3>
+                        <p>Atur kelompok KP dan tetapkan dosen pembimbing.</p>
+                    </a>
+
+                    <a href="{{ route('admin.sidang.index') }}" class="service-card yellow searchable-card">
+                        <div class="service-icon"><iconify-icon icon="lucide:calendar-clock" width="24" height="24" aria-hidden="true"></iconify-icon></div>
+                        <h3>Sidang KP</h3>
+                        <p>Kelola pengajuan sidang dan atur jadwal pelaksanaan.</p>
+                    </a>
+                </div>
+
+                <button
+                    type="button"
+                    class="service-scroll-button"
+                    id="scrollAdminServices"
+                    aria-label="Lihat layanan berikutnya"
+                    aria-controls="adminServiceTrack"
+                >&gt;</button>
+            </div>
+        </section>
     </div>
 
 @endsection
