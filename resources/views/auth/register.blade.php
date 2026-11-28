@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi | SIMPUL</title>
+    <title>Buat Akun Baru | SIMPUL</title>
 
     <!-- Google Font: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,328 +11,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --navy: #003B5C;
-            --ocean: #005C8A;
-            --primary: #0095D9;
-            --cyan: #38BDF8;
-            --teal: #06B6D4;
-            --fog: #DCF1FB;
-            --bg: #F0F7FD;
-            --white: #FFFFFF;
-            --text: #09111E;
-            --body: #162238;
-            --muted: #2B3D56;
-            --border: #C8E1F5;
-            --blue: #2563EB;
-            --blue-dark: #003B5C;
-        }
+        :root { --ink-headline: #091e3a; --ink-body: #1e293b; --ink-subtext: #475569; --ink-muted: #64748b; --sky-dark: #1d4ed8; --sky-primary: #2563eb; --sky-vibrant: #3b82f6; --border-soft: #e2e8f0; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px 14px; overflow-x: hidden; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--ink-body); background: linear-gradient(180deg, #1d4ed8 0%, #2563eb 20%, #3b82f6 42%, #60a5fa 65%, #93c5fd 82%, #dbeafe 93%, #fff 100%); background-attachment: fixed; -webkit-font-smoothing: antialiased; }
+        body::before, body::after { content: ''; position: fixed; inset: -20%; z-index: 0; pointer-events: none; filter: blur(48px); background: radial-gradient(ellipse at 35% 30%, rgba(255,255,255,.3), transparent 60%); animation: ambient 16s ease-in-out infinite alternate; }
+        body::after { background: radial-gradient(ellipse at 70% 60%, rgba(147,197,253,.35), transparent 58%); animation-duration: 20s; }
+        @keyframes ambient { to { transform: translate(30px, 24px) scale(1.06); } }
+        a { color: var(--sky-primary); text-decoration: none; }
+        .login-stage-container { position: relative; z-index: 1; width: min(1050px, 100%); margin: auto; }
+        .dual-pane-card { display: grid; grid-template-columns: 1.05fr .95fr; gap: 16px; padding: 16px; border: 1px solid rgba(255,255,255,.85); border-radius: 28px; background: #fff; box-shadow: 0 25px 60px -12px rgba(37,99,235,.22); }
+        .showcase-pane { position: relative; min-height: 600px; padding: 38px 40px 34px; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; color: #fff; background: linear-gradient(150deg,#091e3a 0%,#1d4ed8 45%,#2563eb 80%,#3b82f6 100%); }
+        .showcase-glow { position: absolute; top: 15%; right: -15%; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle,rgba(96,165,250,.5),transparent 70%); filter: blur(30px); }
+        .showcase-back-bar, .showcase-bottom-block { position: relative; z-index: 1; }
+        .showcase-back-btn { color: rgba(255,255,255,.88); font-size: 13px; font-weight: 600; }
+        .showcase-visual-hub { position: relative; z-index: 1; height: 225px; display: flex; align-items: center; justify-content: center; }
+        .ui-float-card-chart, .ui-float-card-pie, .ui-pill-badge { position: absolute; border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.14); backdrop-filter: blur(12px); box-shadow: 0 14px 28px rgba(0,20,60,.2); }
+        .ui-float-card-chart { top: 12%; left: 0; width: 60%; padding: 14px; border-radius: 14px; }
+        .chart-header, .pie-label { color: #dbeafe; font-size: 11px; font-weight: 600; }
+        .chart-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .chart-dot, .badge-pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #38bdf8; }
+        .chart-svg { width: 100%; height: 52px; }
+        .ui-float-card-pie { right: 0; bottom: 8%; width: 120px; padding: 14px; border-radius: 15px; text-align: center; }
+        .pie-ring-wrap { position: relative; width: 58px; height: 58px; margin: 0 auto 6px; }
+        .pie-ring-svg { width: 58px; height: 58px; transform: rotate(-90deg); }
+        .pie-ring-bg, .pie-ring-fill { fill: none; stroke-width: 5; }
+        .pie-ring-bg { stroke: rgba(255,255,255,.2); }
+        .pie-ring-fill { stroke: #38bdf8; stroke-linecap: round; stroke-dasharray: 175; stroke-dashoffset: 44; }
+        .pie-center-text { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+        .ui-pill-badge { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+        .pill-badge-top { top: 2%; right: 4%; }
+        .pill-badge-bot { bottom: 0; left: 4%; }
+        .badge-pulse-dot { background: #10b981; }
+        .showcase-headline { margin-bottom: 9px; font-size: 22px; font-weight: 700; line-height: 1.25; letter-spacing: -.4px; }
+        .showcase-desc { margin-bottom: 15px; color: #e0f2fe; font-size: 12px; line-height: 1.65; }
+        .carousel-dot { display: inline-block; width: 5px; height: 4px; margin-right: 4px; border-radius: 4px; background: rgba(255,255,255,.4); }
+        .carousel-dot.active { width: 20px; background: #fff; }
+        .form-pane { min-width: 0; padding: 30px 42px 26px; border-radius: 22px; display: flex; flex-direction: column; justify-content: center; }
+        .back-link { align-self: flex-start; margin-bottom: 14px; font-size: 11px; }
+        .form-header-block { margin-bottom: 18px; text-align: center; }
+        .form-headline { margin-bottom: 4px; color: var(--ink-headline); font-size: 23px; font-weight: 700; line-height: 1.2; letter-spacing: -.3px; }
+        .form-subtitle { color: var(--ink-muted); font-size: 12px; line-height: 1.5; }
+        .alert-error { margin-bottom: 12px; padding: 9px 12px; border: 1px solid #fecaca; border-radius: 9px; background: #fef2f2; color: #b91c1c; font-size: 11px; line-height: 1.5; }
+        .role-section { margin-bottom: 12px; }
+        .role-title, .field label { display: block; margin-bottom: 5px; color: var(--ink-body); font-size: 11.5px; font-weight: 600; }
+        .role-card { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 7px; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 10px; background: #fff; cursor: pointer; }
+        .role-card.active { border-color: var(--sky-primary); background: #f4f8ff; }
+        .role-card input { margin-top: 3px; accent-color: var(--sky-primary); }
+        .role-name { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 700; }
+        .role-description { display: block; color: var(--ink-subtext); font-size: 10px; line-height: 1.45; }
+        .role-notice { margin-top: 8px; padding: 9px 10px; border: 1px solid #bfdbfe; border-radius: 9px; background: #eff6ff; color: #536b8b; font-size: 10px; line-height: 1.5; }
+        .field { margin-bottom: 13px; }
+        .field input, .field select { width: 100%; height: 44px; padding: 0 14px; border: 1px solid #cbd5e1; border-radius: 10px; outline: none; background: #f8fafc; color: var(--ink-headline); font: 13px inherit; font-family: inherit; font-size: 13px; transition: .2s; }
+        .field input:focus, .field select:focus { border-color: var(--sky-primary); background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+        .field input::placeholder { color: #94a3b8; }
+        .field select:disabled { background: #f3f6fa; color: #94a3b8; cursor: not-allowed; }
+        .field-hint, .field-error { display: block; margin-top: 5px; font-size: 10px; }
+        .field-hint { color: var(--ink-muted); }
+        .field-error { color: #b91c1c; }
+        .client-error { display: block; margin-top: 5px; color: #b91c1c; font-size: 10px; }
+        .copyright { display: none; }
+        .step-indicator { margin: 0 0 15px; }
+        .step-topline { display: flex; justify-content: space-between; margin-bottom: 7px; color: var(--ink-muted); font-size: 10px; }
+        .progress-track { height: 5px; overflow: hidden; border-radius: 5px; background: #e2e8f0; }
+        .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg,#1d4ed8,#3b82f6); transition: width .35s ease; }
+        .form-step { display: none; animation: stepIn .28s ease both; }
+        .form-step.active { display: block; }
+        @keyframes stepIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+        .step-actions { display: flex; gap: 10px; margin-top: 5px; }
+        .step-btn { min-height: 46px; padding: 0 18px; border: 0; border-radius: 11px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .step-btn.next, .step-btn.submit { flex: 1; background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; box-shadow: 0 8px 24px rgba(37,99,235,.3); }
+        .step-btn.previous { border: 1px solid #cbd5e1; background: #fff; color: #475569; }
+        .form-signup-prompt { margin-top: 13px; text-align: center; color: var(--ink-muted); font-size: 11px; }
+        .form-signup-prompt a { color: var(--sky-primary); font-weight: 600; }
+        @media (max-width: 900px) { body { align-items: flex-start; padding: 14px 12px; } .login-stage-container { max-width: 540px; } .dual-pane-card { grid-template-columns: 1fr; padding: 12px; gap: 12px; border-radius: 24px; } .showcase-pane { min-height: 300px; padding: 20px 22px; border-radius: 18px; } .showcase-visual-hub { height: 145px; margin: 8px 0; } .showcase-bottom-block { display: block; } .showcase-headline { font-size: 19px; } .form-pane { padding: 24px 28px 22px; border-radius: 18px; } }
+        @media (max-width: 480px) { body { padding: 8px; } .dual-pane-card { padding: 8px; border-radius: 20px; } .showcase-pane { min-height: 245px; padding: 16px; } .showcase-visual-hub { height: 125px; } .ui-float-card-chart { width: 58%; } .ui-float-card-pie { width: 105px; padding: 10px; } .form-pane { padding: 20px 14px 18px; } .form-headline { font-size: 20px; } .step-btn { padding: 0 13px; } }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--body);
-            background:
-                radial-gradient(ellipse 70% 50% at 10% 15%, rgba(0, 149, 217, 0.14) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 90% 85%, rgba(56, 189, 248, 0.12) 0%, transparent 60%),
-                var(--bg);
-        }
-
-        a {
-            color: var(--blue);
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: var(--blue-dark);
-        }
-
-        .navbar {
-            min-height: 75px;
-            display: flex;
-            align-items: center;
-            padding: 0 6%;
-            background: rgba(255, 255, 255, .92);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-icon {
-            width: 43px;
-            height: 43px;
-            display: grid;
-            place-items: center;
-            background: var(--blue);
-            color: white;
-            border-radius: 12px;
-            font-size: 23px;
-            font-weight: 800;
-            box-shadow: 0 5px 14px #1976e825;
-        }
-
-        .brand-name {
-            font-size: 20px;
-            line-height: 1.3;
-            font-weight: 800;
-            color: var(--blue-dark);
-        }
-
-        .brand-subtitle {
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 35px 20px;
-        }
-
-        .register-card {
-            width: 100%;
-            max-width: 440px;
-            padding: 34px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 22px;
-            box-shadow: 0 18px 55px #315b8814;
-        }
-
-        .back-link {
-            display: inline-block;
-            font-size: 12px;
-            margin-bottom: 25px;
-        }
-
-        .register-card h1 {
-            font-size: 28px;
-            color: var(--blue-dark);
-            margin-bottom: 8px;
-        }
-
-        .description {
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.7;
-            margin-bottom: 24px;
-        }
-
-        .role-section {
-            margin-bottom: 20px;
-        }
-
-        .role-title {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 9px;
-        }
-
-        .role-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 11px;
-            padding: 12px;
-            margin-bottom: 9px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #fff;
-        }
-
-        .role-card.active {
-            border-color: var(--blue);
-            background: #f4f8ff;
-        }
-
-        .role-card input {
-            margin-top: 3px;
-            accent-color: var(--blue);
-        }
-
-        .role-name {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .role-description {
-            display: block;
-            color: var(--muted);
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
-        .role-notice {
-            padding: 11px 12px;
-            border-radius: 9px;
-            background: #f1f7ff;
-            border: 1px solid var(--border);
-            color: #536b8b;
-            font-size: 11px;
-            line-height: 1.6;
-            margin-top: 10px;
-        }
-
-        .alert-error {
-            padding: 12px 13px;
-            margin-bottom: 18px;
-            background: #fff0f0;
-            border: 1px solid #ffd7d7;
-            border-radius: 9px;
-            color: #c33434;
-            font-size: 12px;
-            line-height: 1.7;
-        }
-
-        .field {
-            margin-bottom: 17px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 7px;
-        }
-
-        .field input,
-        .field select {
-            width: 100%;
-            height: 44px;
-            padding: 0 13px;
-            border: 1px solid #cfdded;
-            border-radius: 9px;
-            background: white;
-            color: var(--text);
-            font-family: inherit;
-            font-size: 13px;
-            outline: none;
-            transition: .2s;
-        }
-
-        .field input:focus,
-        .field select:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px #1976e819;
-        }
-
-        .field input::placeholder,
-        .field select:invalid {
-            color: #a0aec0;
-        }
-
-        .field select:disabled {
-            background: #f3f6fa;
-            color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .field-hint {
-            display: block;
-            margin-top: 6px;
-            font-size: 10px;
-            color: var(--muted);
-        }
-
-        .submit-btn {
-            width: 100%;
-            height: 46px;
-            margin-top: 4px;
-            border: none;
-            border-radius: 10px;
-            background: var(--blue);
-            color: white;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: .2s;
-            font-family: inherit;
-        }
-
-        .submit-btn:hover {
-            background: #1265ca;
-            transform: translateY(-1px);
-        }
-
-        .form-footer {
-            margin-top: 22px;
-            text-align: center;
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .copyright {
-            padding: 17px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 11px;
-        }
-
-        @media (max-width: 480px) {
-            .navbar {
-                min-height: 68px;
-                padding: 0 20px;
-            }
-
-            .main {
-                padding: 25px 15px;
-            }
-
-            .register-card {
-                padding: 27px 22px;
-                border-radius: 18px;
-            }
-
-            .register-card h1 {
-                font-size: 25px;
-            }
-        }
     </style>
 </head>
 
 <body>
-
-    <header class="navbar">
-        <a href="{{ url('/') }}" class="brand">
-            <div class="brand-icon">S</div>
-            <div>
-                <div class="brand-name">SIMPUL</div>
-                <div class="brand-subtitle">
-                    Sistem Informasi Manajemen Praktik
+    <main class="login-stage-container">
+        <div class="dual-pane-card">
+            <section class="showcase-pane" aria-label="Informasi SIMPUL">
+                <div class="showcase-glow"></div>
+                <div class="showcase-back-bar"><a href="{{ url('/') }}" class="showcase-back-btn">&lt; Kembali</a></div>
+                <div class="showcase-visual-hub" aria-hidden="true">
+                    <div class="ui-pill-badge pill-badge-top"><span class="badge-pulse-dot"></span><span>Mulai Perjalanan KP</span></div>
+                    <div class="ui-float-card-chart"><div class="chart-header"><span>Aktivitas Mingguan</span><span class="chart-dot"></span></div><svg class="chart-svg" viewBox="0 0 160 48" fill="none"><path d="M0,38 Q30,12 60,26 T120,8 T160,22" stroke="#38bdf8" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="60" cy="26" r="3.5" fill="#fff" stroke="#38bdf8" stroke-width="2"/><circle cx="120" cy="8" r="3.5" fill="#fff" stroke="#38bdf8" stroke-width="2"/></svg></div>
+                    <div class="ui-float-card-pie"><div class="pie-ring-wrap"><svg class="pie-ring-svg" viewBox="0 0 64 64"><circle class="pie-ring-bg" cx="32" cy="32" r="26"/><circle class="pie-ring-fill" cx="32" cy="32" r="26"/></svg><span class="pie-center-text">75%</span></div><div class="pie-label">Progres KP</div></div>
+                    <div class="ui-pill-badge pill-badge-bot"><span>OK</span><span>Logbook Terpantau</span></div>
                 </div>
-            </div>
-        </a>
-    </header>
-
-    <main class="main">
-        <section class="register-card">
+                <div class="showcase-bottom-block"><h2 class="showcase-headline">Bergabung dengan SIMPUL</h2><p class="showcase-desc">Mulai perjalanan Kuliah Praktikmu dengan lebih mudah. Daftarkan akun untuk mengakses layanan administrasi, pengajuan KP, pemantauan logbook, hingga proses penyelesaian Kuliah Praktik dalam satu platform.</p><div><span class="carousel-dot active"></span><span class="carousel-dot"></span><span class="carousel-dot"></span></div></div>
+            </section>
+            <section class="form-pane">
 
             <a href="{{ route('login') }}" class="back-link">
                 ← Kembali ke login
             </a>
 
-            <h1>Buat akun baru</h1>
-
-            <p class="description">
-                Daftarkan akun mahasiswa untuk menggunakan layanan
-                Kuliah Praktik Universitas Lampung.
-            </p>
+            <div class="form-header-block"><h1 class="form-headline">Buat Akun Baru</h1><p class="form-subtitle">Lengkapi informasi berikut untuk mendaftar ke SIMPUL</p></div>
 
             @if ($errors->any())
                 <div class="alert-error">
@@ -342,8 +119,10 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register.process') }}">
+            <form method="POST" action="{{ route('register.process') }}" id="registerForm" novalidate>
                 @csrf
+                <div class="step-indicator" aria-live="polite"><div class="step-topline"><span id="stepLabel">Step 1 dari 3: Informasi Pengguna</span><span id="stepPercent">33%</span></div><div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 33.333%"></div></div></div>
+                <div class="form-step active" data-step="0">
 
                 <div class="role-section">
                     <span class="role-title">Peran pengguna SIMPUL</span>
@@ -405,6 +184,7 @@
                         required
                         autofocus
                     >
+                    @error('name')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
                 <!-- NPM -->
@@ -422,8 +202,11 @@
                     <small class="field-hint">
                         Gunakan NPM sesuai identitas akademik kamu.
                     </small>
+                    @error('npm')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
+                </div>
+                <div class="form-step" data-step="1">
                 <!-- FAKULTAS -->
                 <div class="field">
                     <label for="faculty">Fakultas</label>
@@ -431,6 +214,7 @@
                     <select id="faculty" name="faculty" required>
                         <option value="">Pilih fakultas</option>
                     </select>
+                    @error('faculty')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
                 <!-- PROGRAM STUDI -->
@@ -449,8 +233,11 @@
                     <small class="field-hint">
                         Pilihan program studi akan menyesuaikan fakultas.
                     </small>
+                    @error('major')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
+                </div>
+                <div class="form-step" data-step="2">
                 <!-- EMAIL -->
                 <div class="field">
                     <label for="email">Email</label>
@@ -464,6 +251,7 @@
                         maxlength="255"
                         required
                     >
+                    @error('email')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
                 <!-- PASSWORD -->
@@ -481,6 +269,7 @@
                     <small class="field-hint">
                         Gunakan password minimal 8 karakter.
                     </small>
+                    @error('password')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
                 <!-- KONFIRMASI PASSWORD -->
@@ -497,20 +286,24 @@
                         minlength="8"
                         required
                     >
+                    @error('password_confirmation')<small class="field-error">{{ $message }}</small>@enderror
+                    <small class="field-error" id="passwordMatchError" hidden>Konfirmasi password harus sama.</small>
                 </div>
 
-                <button type="submit" class="submit-btn">
+                </div>
+                <div class="step-actions"><button type="button" class="step-btn previous" id="previousStep" hidden>Previous</button><button type="button" class="step-btn next" id="nextStep">Next</button><button type="submit" class="step-btn submit" id="submitRegistration" hidden>Daftar Sekarang</button></div>
+                <button type="submit" class="submit-btn" id="legacySubmit" hidden>
                     Daftar sebagai Mahasiswa →
                 </button>
 
             </form>
 
-            <div class="form-footer">
-                Sudah punya akun?
-                <a href="{{ route('login') }}">Login di sini</a>
+            <div class="form-signup-prompt">
+                Sudah memiliki akun? <a href="{{ route('login') }}">Masuk di sini</a>
             </div>
 
-        </section>
+            </section>
+        </div>
     </main>
 
     <footer class="copyright">
@@ -518,6 +311,65 @@
     </footer>
 
     <script>
+        const formSteps = Array.from(document.querySelectorAll('.form-step'));
+        const stepNames = ['Informasi Pengguna', 'Informasi Akademik', 'Informasi Akun'];
+        const nextStepButton = document.getElementById('nextStep');
+        const previousStepButton = document.getElementById('previousStep');
+        const submitRegistrationButton = document.getElementById('submitRegistration');
+        const stepLabel = document.getElementById('stepLabel');
+        const progressFill = document.getElementById('progressFill');
+        const stepPercent = document.getElementById('stepPercent');
+        const passwordConfirmation = document.getElementById('password_confirmation');
+        const passwordMatchError = document.getElementById('passwordMatchError');
+        let currentStep = @if ($errors->has('email') || $errors->has('password')) 2 @elseif ($errors->has('faculty') || $errors->has('major')) 1 @else 0 @endif;
+
+        function showStep(step) {
+            currentStep = step;
+            formSteps.forEach(function(panel, index) {
+                panel.classList.toggle('active', index === step);
+            });
+            previousStepButton.hidden = step === 0;
+            nextStepButton.hidden = step === formSteps.length - 1;
+            submitRegistrationButton.hidden = step !== formSteps.length - 1;
+            stepLabel.textContent = `Step ${step + 1} dari ${formSteps.length}: ${stepNames[step]}`;
+            const progress = ((step + 1) / formSteps.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            stepPercent.textContent = `${Math.round(progress)}%`;
+        }
+
+        function validateCurrentStep() {
+            const fields = Array.from(formSteps[currentStep].querySelectorAll('input[required], select[required]'));
+            formSteps[currentStep].querySelectorAll('.client-error').forEach(function(message) { message.remove(); });
+            const invalidField = fields.find(function(field) { return !field.checkValidity(); });
+            if (invalidField) {
+                const message = document.createElement('small');
+                message.className = 'client-error';
+                message.textContent = invalidField.validity.valueMissing ? 'Bagian ini wajib diisi.' : 'Masukkan format yang valid.';
+                invalidField.insertAdjacentElement('afterend', message);
+                invalidField.reportValidity();
+                invalidField.focus();
+                return false;
+            }
+            return true;
+        }
+
+        nextStepButton.addEventListener('click', function() {
+            if (validateCurrentStep()) { showStep(currentStep + 1); }
+        });
+        previousStepButton.addEventListener('click', function() { showStep(currentStep - 1); });
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            const password = document.getElementById('password');
+            if (!validateCurrentStep() || password.value !== passwordConfirmation.value) {
+                event.preventDefault();
+                passwordMatchError.hidden = password.value === passwordConfirmation.value;
+                if (password.value !== passwordConfirmation.value) { passwordConfirmation.focus(); }
+            }
+        });
+        passwordConfirmation.addEventListener('input', function() {
+            passwordMatchError.hidden = this.value === document.getElementById('password').value;
+        });
+        showStep(currentStep);
+
         // Daftar fakultas dan program studi Universitas Lampung.
         // Nama program disertai jenjang agar program yang namanya sama
         // tetapi berbeda jenjang tetap dapat dibedakan.
